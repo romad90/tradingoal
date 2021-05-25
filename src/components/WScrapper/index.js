@@ -44,7 +44,8 @@ class WScrapper {
           'players',
           'total_market_value',
           'mean_market_value',
-          'continent'
+          'continent',
+          'url_teams'
         ]
         
         $(elemSelector).each((parentIdx, parentElem) => {
@@ -53,9 +54,13 @@ class WScrapper {
 
           $(parentElem).children().each((childIdx, childElem) => {
             const tdValue = $(childElem).text()
-            
+
             if (tdValue) {
               leagueObj[keys[keyIdx]] = tdValue
+              const url_teams = $(childElem).find('a').prop('href')
+              if (url_teams) {
+                leagueObj.url_teams = url_teams
+              }
             } else if ($(childElem).find('img.flaggenrahmen').prop('title')) {
               leagueObj[keys[keyIdx]] = $(childElem).find('img.flaggenrahmen').prop('title')
             } else {
@@ -63,12 +68,12 @@ class WScrapper {
             }
             keyIdx++
           })
-
-          console.log(leagueObj)
         })
       })
       .catch(logger.error)
 	}
+
+
 }
 
 module.exports = new WScrapper()
