@@ -1,0 +1,22 @@
+{
+  "name": "tradingoal",
+  "version": "1.0.0",
+  "description": "A tool automating the producing of the journal trading.",
+  "main": "index.js",
+  "author": "Rode",
+  "license": "MIT",
+  "scripts": {
+    "dev": "NODE_ENV=dev && ./node_modules/.bin/nodemon  index.js | ./node_modules/.bin/pino-pretty -c -l"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.9",
+    "cheerio-tableparser": "^1.0.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.7",
+    "pino": "^6.11.3",
+    "pino-pretty": "^4.8.0",
+    "puppeteer": "^9.1.1"
+  }
+}
