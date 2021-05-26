@@ -5,9 +5,10 @@
  * @private
  */
 
-const assert = require('assert').strict
-const axios = require('axios')
-const cheerio = require('cheerio')
+const mod_assert = require('assert').strict
+const mod_axios = require('axios')
+const mod_cheerio = require('cheerio')
+const mod_crypto = require('crypto')
 
 /**
  * Modules variables
@@ -15,65 +16,212 @@ const cheerio = require('cheerio')
  */
 
 const logger = require('../../logger')
-
+const getHash = (s) => {
+  mod_assert.ok(s, "argument 's' cannot be null")
+  return mod_crypto.createHash('sha256').update(s).digest('hex')
+}
+const rValueAsExpected = (opts) => {
+  mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' cannot be null")
+  mod_assert.ok(typeof opts.value === 'string' && opts.value !== null, "argument 'opts.value' cannot be null")
+  
+  opts['currency'] = opts.value.charAt(0)
+  switch (opts.value.slice(-1)){
+    case 'n':
+      opts['unit'] = 'bn'
+    break
+    case 'h':
+      opts['unit'] = 'th'
+      break
+    default:
+      opts['unit']= 'm'
+  }
+  opts.value = opts.value.replace(opts['unit'], '')
+  opts.value = opts.value.replace(opts['currency'], '')
+  opts.value = parseFloat(opts.value)
+  return opts
+}
 /**
  *
  */
 
 class WScrapper {
-  constructor() {
-		logger.info('inside WScrapper')
-  }
+  constructor() {}
 	
-	parseLeague(opts = {name: 'Premier League'}) {
-		assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
-		assert.ok(typeof opts.name === 'string' && opts.name !== null, "argument 'opts.name' must be an string")
-		
-    const url = `https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query=${opts.name}&x=0&y=0`
+	parseLeague(opts, cb) {
+		mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+		mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+		mod_assert.ok(typeof opts.name === 'string' && opts.name !== null, "argument 'opts.name' must be an string")
+	  
+    const rDataAsExpected = (opts) => {
+      mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+      mod_assert.ok(opts.url_logo && opts.url_logo !== null, "argument 'opts.url_logo' cannot be null")
+      mod_assert.ok(opts.league_name && opts.league_name !== null, "argument 'opts.league_name' cannot be null")
+      mod_assert.ok(opts.url_teams && opts.url_teams !== null, "argument 'opts.url_teams' cannot be null")
+      mod_assert.ok(opts.country && opts.country !== null, "argument 'opts.country' cannot be null")
+      mod_assert.ok(opts.url_country_flag, "argument 'opts.url_country_flag' cannot be null")
+      mod_assert.ok(opts.clubs && opts.clubs !== null, "argument 'opts.clubs' cannot be null")
+      mod_assert.ok(opts.players && opts.players !== null, "argument 'opts.players' cannot be null")
+      mod_assert.ok(opts.total_market_value && opts.total_market_value !== null, "argument 'opts.total_market_value' cannot be null")
+      mod_assert.ok(opts.mean_market_value && opts.mean_market_value !== null, "argument 'opts.mean_market_value' cannot be null")
+      
+      const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:opts.total_market_value}) 
+      const {value:mean_market_value, unit:mean_market_value_unit, currency:mean_market_value_currency} = rValueAsExpected({value:opts.mean_market_value})
 
-    axios(url)
+      return {
+        league_name: opts.league_name,
+        country: opts.country,
+        url_flag_country: opts.url_country_flag,
+        clubs: opts.clubs,
+        players: opts.players,
+        total_market_value,
+        total_market_value_unit,
+        total_market_value_currency,
+        mean_market_value,
+        mean_market_value_unit,
+        mean_market_value_currency,
+        continent: opts.continent,
+        url_teams: opts.url_teams,
+      }
+    }
+    const url = `https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query=${opts.name}&x=0&y=0`
+    const data = []
+
+    mod_axios(url)
       .then(response => {
         const html = response.data
-        const $ = cheerio.load(html)
+        const $ = mod_cheerio.load(html)
         const elemSelector = '#yw2 > table > tbody > tr'
-        const keys = [
-          'src_img',
-          'competition',
-          'country',
-          'clubs',
-          'players',
-          'total_market_value',
-          'mean_market_value',
-          'continent',
-          'url_teams'
-        ]
-        
+        const rawLeagueObj = {}
+       
         $(elemSelector).each((parentIdx, parentElem) => {
           let keyIdx = 0
-          const leagueObj = {}
+          const uniq = {}
+          const rawKeys = [
+            'url_logo',
+            'league_name',
+            'url_teams',
+            'country',
+            'url_country_flag',
+            'clubs',
+            'players',
+            'total_market_value',
+            'mean_market_value',
+            'continent' 
+          ]
+ 
+          $(parentElem).children().each((childIdx, childElem) => {
+            const tdValue = $(childElem).text()
+            const tdValueImgTitle = $(childElem).find('img.flaggenrahmen').prop('title')
+            const tdValueAHref = $(childElem).find('a').prop('href')
+            const tdValueImgSrc =  $(childElem).find('img').prop('src')
+            
+            if (tdValue && !uniq[getHash(tdValue)]) {
+              uniq[getHash(tdValue)] = true
+              rawLeagueObj[rawKeys[keyIdx]] = tdValue
+              keyIdx++
+            }
+            
+            if (tdValueImgTitle && !uniq[getHash(tdValueImgTitle)]) {
+              uniq[getHash(tdValueImgTitle)] = true
+              rawLeagueObj[rawKeys[keyIdx]] = tdValueImgTitle
+              keyIdx++
+            }
+
+            if (tdValueAHref && !uniq[getHash(tdValueAHref)]) {
+              uniq[getHash(tdValueAHref)] = true
+              rawLeagueObj[rawKeys[keyIdx]] = tdValueAHref
+              keyIdx++
+            }
+            
+            if (tdValueImgSrc && !uniq[getHash(tdValueImgSrc)]) {
+              uniq[getHash(tdValueImgSrc)] = true
+              rawLeagueObj[rawKeys[keyIdx]] = tdValueImgSrc
+              keyIdx++
+            }
+          })
+          data.push(rDataAsExpected(rawLeagueObj))
+        })
+        return cb(null, data)
+      })
+      .catch(console.error)
+	}
+  
+  parseTeam(opts, cb) {
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+		mod_assert.ok(opts.url_teams, "argument 'opts.url_teams' cannot be null")
+		mod_assert.ok(typeof opts.url_teams === 'string', "argument 'opts.url_teams' must be a string")
+  
+    const keys = [
+          'url_logo',
+          'url_players',
+          'name',
+          'short_name',
+          'total_market_value',
+          'total_market_value_unit',
+          'average_market_value_player',
+          'average_market_value_player_unit',
+          'url_players'
+    ]
+    const url = `https://www.transfermarkt.com${opts.url_teams}`
+    
+    mod_axios(url)
+      .then(response => {
+        const html = response.data
+        const $ = mod_cheerio.load(html)
+        const elemSelector = '#yw1 > table > tbody > tr'
+        const units = [
+          'bn',
+          'm',
+          'th'
+        ]
+        const rawKeys = [
+          'url_teams',
+          'url_logo',
+          'name',
+          'short_name',
+          'squad',
+          'unknow',
+          'average_age',
+          'foreigners',
+          'total_market_value',
+          'average_market_value'
+        ]
+
+        $(elemSelector).each((parentIdx, parentElem) => {
+          let keyIdx = 0
+          const teamObj = {}
+          const uniq = {}
 
           $(parentElem).children().each((childIdx, childElem) => {
             const tdValue = $(childElem).text()
-
-            if (tdValue) {
-              leagueObj[keys[keyIdx]] = tdValue
-              const url_teams = $(childElem).find('a').prop('href')
-              if (url_teams) {
-                leagueObj.url_teams = url_teams
-              }
-            } else if ($(childElem).find('img.flaggenrahmen').prop('title')) {
-              leagueObj[keys[keyIdx]] = $(childElem).find('img.flaggenrahmen').prop('title')
-            } else {
-              leagueObj[keys[keyIdx]] = $(childElem).find('img').prop('src')
+            const tdValueHref = $(childElem).find('a').prop('href')
+            const tdValueImgSrc = $(childElem).find('a img.tiny_wappen').prop('src')
+            
+            if(tdValue && !uniq[getHash(tdValue)]) {
+              uniq[getHash(tdValue)] = true
+              teamObj[rawKeys[keyIdx]] = tdValue
+              keyIdx++
             }
-            keyIdx++
+            
+             if(tdValueHref && !uniq[getHash(tdValueHref)]) {
+              uniq[getHash(tdValueHref)] = true
+              teamObj[rawKeys[keyIdx]] = tdValueHref
+              keyIdx++
+            }
+            
+            if(tdValueImgSrc && !uniq[getHash(tdValueImgSrc)]) {
+              uniq[getHash(tdValueImgSrc)] = true
+              teamObj[rawKeys[keyIdx]] = tdValueImgSrc
+              keyIdx++
+            }
           })
+          console.log(teamObj)
         })
+
+        //TODO: Might need to clean "data", before save them in the database.
       })
-      .catch(logger.error)
-	}
-
-
+      .catch(console.error)
+  }
 }
 
 module.exports = new WScrapper()

@@ -6,7 +6,7 @@
   "author": "Rode",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=dev && ./node_modules/.bin/nodemon  index.js | ./node_modules/.bin/pino-pretty -c -l"
+    "dev": "NODE_ENV=dev && ./node_modules/.bin/nodemon --trace-warnings index.js | ./node_modules/.bin/pino-pretty -c -l"
   },
   "dependencies": {
     "async": "^3.2.0",
