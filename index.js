@@ -17,9 +17,8 @@ const WScrapper = require('./src/components/WScrapper')
  */
 mod_async.parallel([
     mod_async.apply(WScrapper.parseLeague, {name: 'Premier League'}),
-    //function(callback) { ... }
+    mod_async.apply(WScrapper.parseTeam, {url_teams:'/premier-league/startseite/wettbewerb/GB1'})
 ], (err, results) => {
     if (err) throw err
     console.log(results)
 })
-//WScrapper.parseTeam({url_teams:'/premier-league/startseite/wettbewerb/GB1'})

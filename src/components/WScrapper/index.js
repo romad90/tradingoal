@@ -68,8 +68,8 @@ class WScrapper {
       const {value:mean_market_value, unit:mean_market_value_unit, currency:mean_market_value_currency} = rValueAsExpected({value:opts.mean_market_value})
 
       return {
-        league_name: opts.league_name,
-        country: opts.country,
+        league_name: opts.league_name.trim(),
+        country: opts.country.trim(),
         url_flag_country: opts.url_country_flag,
         clubs: opts.clubs,
         players: opts.players,
@@ -150,18 +150,36 @@ class WScrapper {
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(opts.url_teams, "argument 'opts.url_teams' cannot be null")
 		mod_assert.ok(typeof opts.url_teams === 'string', "argument 'opts.url_teams' must be a string")
-  
-    const keys = [
-          'url_logo',
-          'url_players',
-          'name',
-          'short_name',
-          'total_market_value',
-          'total_market_value_unit',
-          'average_market_value_player',
-          'average_market_value_player_unit',
-          'url_players'
-    ]
+      
+    const rDataAsExpected = (opts) => {
+      mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+      mod_assert.ok(opts.url_players && opts.url_players !== null, "argument 'opts.url_players' cannot be null")
+      mod_assert.ok(opts.url_logo && opts.url_logo !== null, "argument 'opts.url_logo' cannot be null") 
+      mod_assert.ok(opts.name && opts.name !== null, "argument 'opts.name' cannot be null")
+      mod_assert.ok(opts.short_name && opts.short_name !== null, "argument 'opts.short_name' cannot be null")
+      mod_assert.ok(opts.squad && opts.squad !== null, "argument 'opts.squad' cannot be null")
+      mod_assert.ok(opts.average_age && opts.average_age !== null, "argument 'opts.average_age' cannot be null")
+      mod_assert.ok(opts.foreigners && opts.foreigners !== null, "argument 'opts.foreigners' cannot be null")
+      mod_assert.ok(opts.total_market_value && opts.total_market_value !== null, "argument 'opts.total_market_value' cannot be null")
+      mod_assert.ok(opts.mean_market_value && opts.mean_market_value !== null, "argument 'opts.mean_market_value' cannot be null")
+
+      const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:opts.total_market_value}) 
+      const {value:average_market_value, unit:average_market_value_unit, currency:average_market_value_currency} = rValueAsExpected({value:opts.mean_market_value})
+
+      return {
+        name: opts.name.trim(),
+        short_name: opts.short_name.trim(),
+        total_market_value,
+        total_market_value_unit,
+        total_market_value_currency,
+        average_market_value,
+        average_market_value_unit,
+        average_market_value_currency,
+        url_logo: opts.url_logo,
+        url_players: opts.url_players,
+      }
+    }
+    const data = []
     const url = `https://www.transfermarkt.com${opts.url_teams}`
     
     mod_axios(url)
@@ -169,13 +187,8 @@ class WScrapper {
         const html = response.data
         const $ = mod_cheerio.load(html)
         const elemSelector = '#yw1 > table > tbody > tr'
-        const units = [
-          'bn',
-          'm',
-          'th'
-        ]
         const rawKeys = [
-          'url_teams',
+          'url_players',
           'url_logo',
           'name',
           'short_name',
@@ -184,7 +197,7 @@ class WScrapper {
           'average_age',
           'foreigners',
           'total_market_value',
-          'average_market_value'
+          'mean_market_value'
         ]
 
         $(elemSelector).each((parentIdx, parentElem) => {
@@ -215,10 +228,9 @@ class WScrapper {
               keyIdx++
             }
           })
-          console.log(teamObj)
+          data.push(rDataAsExpected(teamObj))
         })
-
-        //TODO: Might need to clean "data", before save them in the database.
+        return cb(null, data)
       })
       .catch(console.error)
   }
