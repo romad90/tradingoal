@@ -49,7 +49,7 @@ DROP TABLE IF EXISTS `LEAGUE`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `LEAGUE` (
-  `league_id` int NOT NULL AUTO_INCREMENT,
+  `league_id` int NOT NULL,
   `league_name` varchar(100) NOT NULL,
   `country` varchar(100) DEFAULT NULL,
   `url_flag_country` varchar(300) NOT NULL,
@@ -63,9 +63,8 @@ CREATE TABLE `LEAGUE` (
   `mean_market_value_currency` varchar(1) NOT NULL,
   `continent` varchar(100) DEFAULT NULL,
   `url_teams` varchar(300) NOT NULL,
-  `url_logo` varchar(300) NOT NULL,
-  PRIMARY KEY (`league_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `url_logo` varchar(300) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,17 +85,12 @@ DROP TABLE IF EXISTS `PLAYER`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PLAYER` (
-  `player_id` int NOT NULL AUTO_INCREMENT,
-  `position` varchar(100) NOT NULL,
-  `first_name` varchar(100) NOT NULL,
-  `last_name` varchar(100) NOT NULL,
-  `full_name` varchar(300) NOT NULL,
-  `date_of_birth` date NOT NULL,
-  `current_international` varchar(100) NOT NULL,
-  `caps` int NOT NULL,
-  `value` float NOT NULL,
-  `last_update` date NOT NULL,
-  PRIMARY KEY (`player_id`)
+  `player_id` int NOT NULL,
+  `name` varchar(300) NOT NULL,
+  `market_value` float NOT NULL,
+  `market_value_unit` varchar(2) NOT NULL,
+  `market_value_currency` varchar(1) NOT NULL,
+  `last_update` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -165,16 +159,17 @@ DROP TABLE IF EXISTS `TEAM`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `TEAM` (
-  `team_id` int NOT NULL AUTO_INCREMENT,
+  `team_id` int NOT NULL,
   `name` varchar(100) NOT NULL,
   `short_name` varchar(100) NOT NULL,
   `total_market_value` float NOT NULL,
-  `total_market_value_unit` varchar(1) NOT NULL,
+  `total_market_value_unit` varchar(2) NOT NULL,
+  `total_market_value_currency` varchar(1) NOT NULL,
   `average_market_value_player` float NOT NULL,
-  `average_market_value_player_unit` varchar(1) NOT NULL,
+  `average_market_value_player_unit` varchar(2) NOT NULL,
+  `average_market_value_player_currency` varchar(1) NOT NULL,
   `url_logo` varchar(300) NOT NULL,
-  `url_players` varchar(300) NOT NULL,
-  PRIMARY KEY (`team_id`)
+  `url_players` varchar(300) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -229,4 +224,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-05-26 18:40:01
+-- Dump completed on 2021-05-27 13:48:32

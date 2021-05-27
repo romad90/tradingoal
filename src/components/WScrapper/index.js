@@ -30,6 +30,7 @@ const rValueAsExpected = (opts) => {
       opts['unit'] = 'bn'
     break
     case 'h':
+    case '.':
       opts['unit'] = 'th'
       break
     default:
@@ -40,6 +41,7 @@ const rValueAsExpected = (opts) => {
   opts.value = parseFloat(opts.value)
   return opts
 }
+
 /**
  *
  */
@@ -147,6 +149,7 @@ class WScrapper {
 	}
   
   parseTeam(opts, cb) {
+		mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(opts.url_teams, "argument 'opts.url_teams' cannot be null")
 		mod_assert.ok(typeof opts.url_teams === 'string', "argument 'opts.url_teams' must be a string")
@@ -229,6 +232,66 @@ class WScrapper {
             }
           })
           data.push(rDataAsExpected(teamObj))
+        })
+        return cb(null, data)
+      })
+      .catch(console.error)
+  }
+
+  parsePlayer(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+		mod_assert.ok(typeof opts.url_players === 'string' && opts.url_players !== null, "argument 'opts.players' must be an string")
+
+    const rDataAsExpected = (opts) => {
+      mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+      mod_assert.ok(opts.numbers && opts.numbers !== null, "argument 'opts.numbers' cannot be null")
+      mod_assert.ok(opts.irrelevant && opts.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
+      mod_assert.ok(opts.name && opts.name !== null, "argument 'opts.name' cannot be null") 
+      mod_assert.ok(opts.irrelevant1 && opts.irrelevant1 !== null, "argument 'opts.irrelevant1' cannot be null")
+      mod_assert.ok(opts.market_value && opts.market_value !== null, "argument 'opts.market_value' cannot be null")
+
+      const {value:market_value, unit:market_value_unit, currency:market_value_currency} = rValueAsExpected({value:opts.market_value}) 
+
+      return {
+        name: opts.name.trim(),
+        market_value,
+        market_value_unit,
+        market_value_currency,
+      }
+    }
+
+    const data = []
+    const url = `https://www.transfermarkt.com${opts.url_players}`
+ 
+    mod_axios(url)
+      .then(response => {
+        const html = response.data
+        const $ = mod_cheerio.load(html)
+        const elemSelector = '#yw1 > table > tbody > tr'
+        const rawKeys = [
+          'numbers',
+          'irrelevant',
+          'name',
+          'irrelevant1',
+          'market_value',
+        ]
+
+        $(elemSelector).each((parentIdx, parentElem) => {
+          let keyIdx = 0
+          const playerObj = {}
+          const uniq = {}
+
+          $(parentElem).children().each((childIdx, childElem) => {
+            const tdValue = $(childElem).text()
+            
+            if(tdValue && !uniq[getHash(tdValue)]) {
+              uniq[getHash(tdValue)] = true
+              playerObj[rawKeys[keyIdx]] = tdValue
+              keyIdx++
+            }
+          })
+          data.push(rDataAsExpected(playerObj))
         })
         return cb(null, data)
       })
