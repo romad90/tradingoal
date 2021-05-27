@@ -83,6 +83,7 @@ class WScrapper {
         mean_market_value_currency,
         continent: opts.continent,
         url_teams: opts.url_teams,
+				url_logo: opts.url_logo
       }
     }
     const url = `https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query=${opts.name}&x=0&y=0`
