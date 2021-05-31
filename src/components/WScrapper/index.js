@@ -38,7 +38,12 @@ const rValueAsExpected = (opts) => {
   }
   opts.value = opts.value.replace(opts['unit'], '')
   opts.value = opts.value.replace(opts['currency'], '')
-  opts.value = parseFloat(opts.value)
+  opts.value = parseFloat(opts.value) || 0
+	
+	if (opts.value === 0) {
+		opts['unit']= 'm'
+		opts['currency'] = '€'
+	}
   return opts
 }
 
@@ -53,49 +58,64 @@ class WScrapper {
 		mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
 		mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(typeof opts.name === 'string' && opts.name !== null, "argument 'opts.name' must be an string")
-	  
-    const rDataAsExpected = (opts) => {
-      mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
-      mod_assert.ok(opts.url_logo && opts.url_logo !== null, "argument 'opts.url_logo' cannot be null")
-      mod_assert.ok(opts.league_name && opts.league_name !== null, "argument 'opts.league_name' cannot be null")
-      mod_assert.ok(opts.url_teams && opts.url_teams !== null, "argument 'opts.url_teams' cannot be null")
-      mod_assert.ok(opts.country && opts.country !== null, "argument 'opts.country' cannot be null")
-      mod_assert.ok(opts.url_country_flag, "argument 'opts.url_country_flag' cannot be null")
-      mod_assert.ok(opts.clubs && opts.clubs !== null, "argument 'opts.clubs' cannot be null")
-      mod_assert.ok(opts.players && opts.players !== null, "argument 'opts.players' cannot be null")
-      mod_assert.ok(opts.total_market_value && opts.total_market_value !== null, "argument 'opts.total_market_value' cannot be null")
-      mod_assert.ok(opts.mean_market_value && opts.mean_market_value !== null, "argument 'opts.mean_market_value' cannot be null")
+		mod_assert.ok(typeof opts.league_id === 'number' && opts.league_id !== null, "argument 'opts.league_id' must be a number")
+		
+    const rDataAsExpected = (_) => {
+      mod_assert.ok(typeof _ === 'object' && _ !== null, "argument '_' must be an object")
+      mod_assert.ok(_.url_logo && _.url_logo !== null, "argument '_.url_logo' cannot be null")
+      mod_assert.ok(_.league_name && _.league_name !== null, "argument '_.league_name' cannot be null")
+      mod_assert.ok(_.url_teams && _.url_teams !== null, "argument '_.url_teams' cannot be null")
+      mod_assert.ok(_.country && _.country !== null, "argument '_.country' cannot be null")
+      mod_assert.ok(_.url_country_flag, "argument '_.url_country_flag' cannot be null")
+      mod_assert.ok(_.clubs && _.clubs !== null, "argument '_.clubs' cannot be null")
+      mod_assert.ok(_.players && _.players !== null, "argument '_.players' cannot be null")
+      mod_assert.ok(_.total_market_value && _.total_market_value !== null, "argument '_.total_market_value' cannot be null")
+      mod_assert.ok(_.mean_market_value && _.mean_market_value !== null, "argument '_.mean_market_value' cannot be null")
       
-      const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:opts.total_market_value}) 
-      const {value:mean_market_value, unit:mean_market_value_unit, currency:mean_market_value_currency} = rValueAsExpected({value:opts.mean_market_value})
-
+      const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:_.total_market_value}) 
+      const {value:mean_market_value, unit:mean_market_value_unit, currency:mean_market_value_currency} = rValueAsExpected({value:_.mean_market_value})
+						
       return {
-        league_name: opts.league_name.trim(),
-        country: opts.country.trim(),
-        url_flag_country: opts.url_country_flag,
-        clubs: opts.clubs,
-        players: opts.players,
+				league_id: opts.league_id,
+        league_name: _.league_name.trim(),
+        country: _.country.trim(),
+        url_flag_country: _.url_country_flag,
+        clubs: _.clubs,
+        players: _.players,
         total_market_value,
         total_market_value_unit,
         total_market_value_currency,
         mean_market_value,
         mean_market_value_unit,
         mean_market_value_currency,
-        continent: opts.continent,
-        url_teams: opts.url_teams,
-				url_logo: opts.url_logo
+        continent: _.continent,
+        url_teams: _.url_teams,
+				url_logo: _.url_logo
       }
     }
+		const filterLeague = opts.filter
     const url = `https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query=${opts.name}&x=0&y=0`
     const data = []
-
+		const funnelingData = (elm) => {
+			if (filterLeague) {
+				for (const k in filterLeague) {
+					if (filterLeague.hasOwnProperty(k)) {
+						if (filterLeague[k] !== elm[k]) return false
+				  }
+				}
+			}
+			return true
+		}
+		
+		if (opts.filter) delete opts.filter
+		
     mod_axios(url)
       .then(response => {
         const html = response.data
         const $ = mod_cheerio.load(html)
-        const elemSelector = '#yw2 > table > tbody > tr'
+        const elemSelector = 'table > tbody > tr'
         const rawLeagueObj = {}
-       
+				
         $(elemSelector).each((parentIdx, parentElem) => {
           let keyIdx = 0
           const uniq = {}
@@ -144,7 +164,7 @@ class WScrapper {
           })
           data.push(rDataAsExpected(rawLeagueObj))
         })
-        return cb(null, data)
+        return cb(null, data.filter(funnelingData))
       })
       .catch(console.error)
 	}
@@ -152,35 +172,39 @@ class WScrapper {
   parseTeam(opts, cb) {
 		mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+		mod_assert.ok(opts.league_id, "argument 'opts.league_id' cannot be null")
 		mod_assert.ok(opts.url_teams, "argument 'opts.url_teams' cannot be null")
 		mod_assert.ok(typeof opts.url_teams === 'string', "argument 'opts.url_teams' must be a string")
       
-    const rDataAsExpected = (opts) => {
-      mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
-      mod_assert.ok(opts.url_players && opts.url_players !== null, "argument 'opts.url_players' cannot be null")
-      mod_assert.ok(opts.url_logo && opts.url_logo !== null, "argument 'opts.url_logo' cannot be null") 
-      mod_assert.ok(opts.name && opts.name !== null, "argument 'opts.name' cannot be null")
-      mod_assert.ok(opts.short_name && opts.short_name !== null, "argument 'opts.short_name' cannot be null")
-      mod_assert.ok(opts.squad && opts.squad !== null, "argument 'opts.squad' cannot be null")
-      mod_assert.ok(opts.average_age && opts.average_age !== null, "argument 'opts.average_age' cannot be null")
-      mod_assert.ok(opts.foreigners && opts.foreigners !== null, "argument 'opts.foreigners' cannot be null")
-      mod_assert.ok(opts.total_market_value && opts.total_market_value !== null, "argument 'opts.total_market_value' cannot be null")
-      mod_assert.ok(opts.mean_market_value && opts.mean_market_value !== null, "argument 'opts.mean_market_value' cannot be null")
+    const rDataAsExpected = (_) => {
+      mod_assert.ok(typeof _ === 'object' && _ !== null, "argument 'opts' must be an object")
+      mod_assert.ok(_.url_players && _.url_players !== null, "argument 'opts.url_players' cannot be null")
+      mod_assert.ok(_.url_logo && _.url_logo !== null, "argument 'opts.url_logo' cannot be null") 
+      mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null")
+      mod_assert.ok(_.short_name && _.short_name !== null, "argument 'opts.short_name' cannot be null")
+      mod_assert.ok(_.squad && _.squad !== null, "argument 'opts.squad' cannot be null")
+      mod_assert.ok(_.average_age && _.average_age !== null, "argument 'opts.average_age' cannot be null")
+      mod_assert.ok(_.foreigners && _.foreigners !== null, "argument 'opts.foreigners' cannot be null")
+      mod_assert.ok(_.total_market_value && _.total_market_value !== null, "argument 'opts.total_market_value' cannot be null")
+      mod_assert.ok(_.mean_market_value && _.mean_market_value !== null, "argument 'opts.mean_market_value' cannot be null")
 
-      const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:opts.total_market_value}) 
-      const {value:average_market_value, unit:average_market_value_unit, currency:average_market_value_currency} = rValueAsExpected({value:opts.mean_market_value})
+      const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:_.total_market_value}) 
+      const {value:average_market_value, unit:average_market_value_unit, currency:average_market_value_currency} = rValueAsExpected({value:_.mean_market_value})
 
       return {
-        name: opts.name.trim(),
-        short_name: opts.short_name.trim(),
+				league_id: opts.league_id,
+				country: opts.country.trim(),
+				team_id: null,
+        name: _.name.trim(),
+        short_name: _.short_name.trim(),
         total_market_value,
         total_market_value_unit,
         total_market_value_currency,
         average_market_value,
         average_market_value_unit,
         average_market_value_currency,
-        url_logo: opts.url_logo,
-        url_players: opts.url_players,
+        url_logo: _.url_logo,
+        url_players: _.url_players,
       }
     }
     const data = []
@@ -243,22 +267,27 @@ class WScrapper {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(typeof opts.url_players === 'string' && opts.url_players !== null, "argument 'opts.players' must be an string")
+		mod_assert.ok(typeof opts.team_id === 'number' && opts.team_id !== null, "argument 'opts.team_id' must be an string")
 
-    const rDataAsExpected = (opts) => {
-      mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
-      mod_assert.ok(opts.numbers && opts.numbers !== null, "argument 'opts.numbers' cannot be null")
-      mod_assert.ok(opts.irrelevant && opts.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
-      mod_assert.ok(opts.name && opts.name !== null, "argument 'opts.name' cannot be null") 
-      mod_assert.ok(opts.irrelevant1 && opts.irrelevant1 !== null, "argument 'opts.irrelevant1' cannot be null")
-      mod_assert.ok(opts.market_value && opts.market_value !== null, "argument 'opts.market_value' cannot be null")
-
-      const {value:market_value, unit:market_value_unit, currency:market_value_currency} = rValueAsExpected({value:opts.market_value}) 
+    const rDataAsExpected = (_) => {
+      mod_assert.ok(typeof _ === 'object' && _ !== null, "argument 'opts' must be an object")
+      mod_assert.ok(_.numbers && _.numbers !== null, "argument 'opts.numbers' cannot be null")
+      mod_assert.ok(_.irrelevant && _.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
+      mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null") 
+      mod_assert.ok(_.irrelevant1 && _.irrelevant1 !== null, "argument 'opts.irrelevant1' cannot be null")
+			
+			if (_.market_value === null) {
+				_.market_value = '€0.0m'
+			}
+      const {value:market_value, unit:market_value_unit, currency:market_value_currency} = rValueAsExpected({value:_.market_value}) 
 
       return {
-        name: opts.name.trim(),
+				team_id: opts.team_id,
+        name: _.name.trim(),
         market_value,
         market_value_unit,
         market_value_currency,
+				last_update: Date.now()
       }
     }
 
@@ -288,7 +317,7 @@ class WScrapper {
             
             if(tdValue && !uniq[getHash(tdValue)]) {
               uniq[getHash(tdValue)] = true
-              playerObj[rawKeys[keyIdx]] = tdValue
+              playerObj[rawKeys[keyIdx]] = tdValue.trim()
               keyIdx++
             }
           })
