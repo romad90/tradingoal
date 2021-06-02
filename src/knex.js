@@ -5,17 +5,31 @@
  * @private
  *
  */
-const propertiesReader = require('properties-reader')
-const properties = propertiesReader('properties.file')
+const config = require('config')
+
 const opts = {
 	client: 'mysql2',
 	connection: {
-		connectionLimit: properties.get('mysql.connectionLimit'),
-		host : properties.get('mysql.host'),
-		port : properties.get('mysql.port'),
-		user : properties.get('mysql.user'),
-		password : properties.get('mysql.password'),
-		database : properties.get('mysql.database')
+		connectionLimit: config.get('mysql.connectionLimit'),
+		host : config.get('mysql.host'),
+		port : config.get('mysql.port'),
+		user : config.get('mysql.user'),
+		password : config.get('mysql.password'),
+		database : config.get('mysql.database'),
+		dateStrings: [
+			'DATE',
+		  'DATETIME'
+		]
+	},
+	pool: {
+		afterCreate: function (conn, done) {
+			conn.query('SET time_zone="UTC";', function (err) {
+				if (err) {
+					return done(err, conn)
+	      } 
+				done(null, conn)
+			})
+		}
 	}
 }
 	

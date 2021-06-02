@@ -16,6 +16,7 @@ const mod_crypto = require('crypto')
  */
 
 const logger = require('../../logger')
+const knex = require('../../knex')
 const getHash = (s) => {
   mod_assert.ok(s, "argument 's' cannot be null")
   return mod_crypto.createHash('sha256').update(s).digest('hex')
@@ -107,7 +108,7 @@ class WScrapper {
 			return true
 		}
 		
-		if (opts.filter) delete opts.filter
+		if (opts.filter) { delete opts.filter } 
 		
     mod_axios(url)
       .then(response => {
@@ -166,7 +167,7 @@ class WScrapper {
         })
         return cb(null, data.filter(funnelingData))
       })
-      .catch(console.error)
+      .catch(() => {})
 	}
   
   parseTeam(opts, cb) {
@@ -189,7 +190,7 @@ class WScrapper {
       mod_assert.ok(_.mean_market_value && _.mean_market_value !== null, "argument 'opts.mean_market_value' cannot be null")
 
       const {value:total_market_value, unit:total_market_value_unit, currency:total_market_value_currency} = rValueAsExpected({value:_.total_market_value}) 
-      const {value:average_market_value, unit:average_market_value_unit, currency:average_market_value_currency} = rValueAsExpected({value:_.mean_market_value})
+      const {value:average_market_value_player, unit:average_market_value_player_unit, currency:average_market_value_player_currency} = rValueAsExpected({value:_.mean_market_value})
 
       return {
 				league_id: opts.league_id,
@@ -200,9 +201,9 @@ class WScrapper {
         total_market_value,
         total_market_value_unit,
         total_market_value_currency,
-        average_market_value,
-        average_market_value_unit,
-        average_market_value_currency,
+        average_market_value_player,
+        average_market_value_player_unit,
+        average_market_value_player_currency,
         url_logo: _.url_logo,
         url_players: _.url_players,
       }
@@ -260,10 +261,12 @@ class WScrapper {
         })
         return cb(null, data)
       })
-      .catch(console.error)
+      .catch(() => {})
   }
 
   parsePlayer(opts, cb) {
+    console.log('---')
+    console.log(opts)
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(typeof opts.url_players === 'string' && opts.url_players !== null, "argument 'opts.players' must be an string")
@@ -287,7 +290,7 @@ class WScrapper {
         market_value,
         market_value_unit,
         market_value_currency,
-				last_update: Date.now()
+				last_update: knex.fn.now()
       }
     }
 
@@ -325,7 +328,7 @@ class WScrapper {
         })
         return cb(null, data)
       })
-      .catch(console.error)
+      .catch(() => {})
   }
 }
 

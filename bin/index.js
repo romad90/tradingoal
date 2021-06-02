@@ -1,23 +1,12 @@
-#!/usr/bin/en node
+#!/usr/bin/env node
 
-/**
- * Module dependencies
- * @private
- */
+require('../src/cli')(process.argv)
 
-const axios = require("axios")
-const boxen = require('boxen')
-const chalk = require('chalk')
-const clear = require ('clear')
-const figlet = require ('figlet')
-const inquirer = require('inquirer')
-
-/**
- * Module variables
- * @private
- */
-
-/**
- * Main
- */
-
+process
+  .on('unhandledRejection', (reason, p) => {
+    console.error(reason, 'Unhandled Rejection at Promise', p)
+  })
+  .on('uncaughtException', err => {
+    console.error(err, 'Uncaught Exception thrown')
+    process.exit(1)
+  })

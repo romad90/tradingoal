@@ -1,0 +1,133 @@
+{
+  "rapidapi-host": "v3.football.api-sports.io",
+  "rapidapi-key": "a9f6d46c4598107951d83d8aeb3f7d36",
+  "mysql": {
+    "connectionLimit": 10,
+    "host": "127.0.0.1",
+    "port": 3306 ,
+    "user": "root",
+    "password": "W%Lr9<5DC3b*$]F}",
+    "database": "season_20_21",
+    "timeout": 10
+  },
+  "leagues": {
+    "argentina": [ 
+      {
+        "name": "Copa de la Liga Profesional de Futbol",
+        "league_id" : 128,
+        "filter": {
+          "continent": "CONMEBOL",
+          "country": "Argentina"
+        }
+      }
+    ],
+    "belgium": [
+      {
+        "name": "Jupiler Pro League",
+        "league_id" : 144,
+        "filter": {
+          "continent": "UEFA",
+          "country": "Belgium"
+        }
+      }
+    ],
+    "brazil": [
+      {
+        "name": "Campeonato Brasileiro Serie A",
+        "league_id" : 71,
+        "filter": {
+          "continent": "CONMEBOL",
+          "country": "Brazil"
+        }
+      }
+    ],
+    "england": [
+      {
+        "name": "Premier League",
+        "league_id" : 39,
+        "filter": {
+          "continent": "UEFA",
+          "country": "England"
+        }
+      },
+      {
+        "name": "Championship",
+        "league_id" : 40,
+        "filter": {
+          "continent": "UEFA",
+          "country": "England"
+	        }
+	     }
+     ],
+     "france": [
+       {
+         "name": "Ligue 1",
+         "league_id" : 61,
+         "filter": {
+           "continent": "UEFA",
+           "country": "France"
+         }
+       }
+     ],
+     "germany": [
+       {
+         "name": "Bundesliga",
+         "league_id" : 78,
+         "filter": {
+           "continent": "UEFA",
+           "country": "Germany"
+         }
+       }
+     ],
+     "italy": [
+       {
+         "name": "Serie A",
+         "league_id" : 135,
+         "filter": {
+           "continent": "UEFA",
+           "country": "Italy"
+         }
+       }
+     ],
+     "netherlands": [
+       {
+         "name": "Eredivisie",
+         "league_id" : 88,
+         "filter": {
+           "continent": "UEFA",
+           "country": "Netherlands"
+         }
+       }
+     ],
+     "portugal": [
+       {
+         "name": "Liga NOS",
+         "league_id" : 94,
+         "filter": {
+           "continent": "UEFA",
+           "country": "Portugal"
+           }
+        }
+     ],
+     "spain": [
+       {
+         "name": "LaLiga",
+	       "league_id" : 140,
+	       "filter": {
+	         "continent": "UEFA",
+					 "country": "Spain"
+           }
+         }
+    ],
+			"turkey": [
+	      {
+	        "name": "Super Lig",
+	        "league_id" : 203,
+	        "filter": {
+	          "continent": "UEFA",
+						"countr": "Turkey"
+	        }
+	      }
+			]
+		}
+}

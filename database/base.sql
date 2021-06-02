@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: season_20_21
 -- ------------------------------------------------------
--- Server version	8.0.23
+-- Server version	8.0.25
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,29 +16,86 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `DOMESTIC_NEXT_FIXTURE`
+-- Table structure for table `ANALYSIS_BF4`
 --
 
-DROP TABLE IF EXISTS `DOMESTIC_NEXT_FIXTURE`;
+DROP TABLE IF EXISTS `ANALYSIS_BF4`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `DOMESTIC_NEXT_FIXTURE` (
-  `match_number` int NOT NULL,
-  `round_number` int NOT NULL,
-  `date_fixture` date NOT NULL,
-  `home_team` int NOT NULL,
-  `away_team` int NOT NULL,
-  `league_id` int NOT NULL
+CREATE TABLE `ANALYSIS_BF4` (
+  `fixture_id` int NOT NULL,
+  `bookmaker_id` int NOT NULL,
+  `home_odds` float NOT NULL,
+  `away_odds` float NOT NULL,
+  `diff_market_cap` float DEFAULT NULL,
+  `strategy_id` blob,
+  `observations` tinytext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `DOMESTIC_NEXT_FIXTURE`
+-- Dumping data for table `ANALYSIS_BF4`
 --
 
-LOCK TABLES `DOMESTIC_NEXT_FIXTURE` WRITE;
-/*!40000 ALTER TABLE `DOMESTIC_NEXT_FIXTURE` DISABLE KEYS */;
-/*!40000 ALTER TABLE `DOMESTIC_NEXT_FIXTURE` ENABLE KEYS */;
+LOCK TABLES `ANALYSIS_BF4` WRITE;
+/*!40000 ALTER TABLE `ANALYSIS_BF4` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ANALYSIS_BF4` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ANALYSIS_DOTM`
+--
+
+DROP TABLE IF EXISTS `ANALYSIS_DOTM`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ANALYSIS_DOTM` (
+  `fixture_id` int NOT NULL,
+  `bookmaker_id` int NOT NULL,
+  `home_odds` float NOT NULL,
+  `away_odds` float NOT NULL,
+  `diff_market_cap` float DEFAULT NULL,
+  `strategy_id` blob,
+  `observations` tinytext
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ANALYSIS_DOTM`
+--
+
+LOCK TABLES `ANALYSIS_DOTM` WRITE;
+/*!40000 ALTER TABLE `ANALYSIS_DOTM` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ANALYSIS_DOTM` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `FIXTURE`
+--
+
+DROP TABLE IF EXISTS `FIXTURE`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `FIXTURE` (
+  `fixture_id` int NOT NULL,
+  `date_fixture` datetime NOT NULL,
+  `home_team` int NOT NULL,
+  `away_team` int NOT NULL,
+  `league_id` int NOT NULL,
+  `status` enum('pending','postp','finished') DEFAULT NULL,
+  PRIMARY KEY (`fixture_id`,`home_team`,`away_team`),
+  KEY `new_index` (`fixture_id`,`home_team`,`away_team`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FIXTURE`
+--
+
+LOCK TABLES `FIXTURE` WRITE;
+/*!40000 ALTER TABLE `FIXTURE` DISABLE KEYS */;
+INSERT INTO `FIXTURE` VALUES (688919,'2021-06-06 14:00:00',124,1193,71,'pending'),(688920,'2021-06-06 21:15:00',121,132,71,'pending'),(688922,'2021-06-06 19:00:00',125,131,71,'pending'),(688924,'2021-06-06 19:00:00',154,119,71,'pending'),(688925,'2021-06-06 23:30:00',123,1062,71,'pending'),(688926,'2021-06-06 00:00:00',794,118,71,'pending'),(688927,'2021-06-06 21:15:00',152,134,71,'pending');
+/*!40000 ALTER TABLE `FIXTURE` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -63,7 +120,9 @@ CREATE TABLE `LEAGUE` (
   `mean_market_value_currency` varchar(1) NOT NULL,
   `continent` varchar(100) DEFAULT NULL,
   `url_teams` varchar(300) NOT NULL,
-  `url_logo` varchar(300) NOT NULL
+  `url_logo` varchar(300) NOT NULL,
+  PRIMARY KEY (`league_id`),
+  KEY `new_index` (`league_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -84,7 +143,7 @@ DROP TABLE IF EXISTS `PLAYER`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PLAYER` (
-  `player_id` int NOT NULL,
+  `team_id` int NOT NULL,
   `name` varchar(300) NOT NULL,
   `market_value` float NOT NULL,
   `market_value_unit` varchar(2) NOT NULL,
@@ -110,11 +169,10 @@ DROP TABLE IF EXISTS `RELIABILITY`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RELIABILITY` (
-  `reliability_id` int NOT NULL AUTO_INCREMENT,
   `league_id` int NOT NULL,
-  `ratio` int NOT NULL,
-  PRIMARY KEY (`reliability_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `reduction` int NOT NULL,
+  PRIMARY KEY (`league_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +181,7 @@ CREATE TABLE `RELIABILITY` (
 
 LOCK TABLES `RELIABILITY` WRITE;
 /*!40000 ALTER TABLE `RELIABILITY` DISABLE KEYS */;
-INSERT INTO `RELIABILITY` VALUES (1,1,1),(2,2,1),(3,3,3),(4,4,3),(5,5,3);
+INSERT INTO `RELIABILITY` VALUES (39,1),(40,3),(61,3),(71,3),(78,1),(88,4),(94,3),(128,4),(135,2),(140,2),(144,4),(203,4);
 /*!40000 ALTER TABLE `RELIABILITY` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -210,39 +268,6 @@ LOCK TABLES `TEAM` WRITE;
 /*!40000 ALTER TABLE `TEAM` DISABLE KEYS */;
 /*!40000 ALTER TABLE `TEAM` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `TRADING_JOURNAL`
---
-
-DROP TABLE IF EXISTS `TRADING_JOURNAL`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `TRADING_JOURNAL` (
-  `round_number` int NOT NULL,
-  `match_number` int NOT NULL,
-  `date_fixture` date NOT NULL,
-  `home_team` int NOT NULL,
-  `home_cap` float NOT NULL,
-  `away_team` int NOT NULL,
-  `away_cap` float NOT NULL,
-  `home_odds` float NOT NULL,
-  `away_odds` float NOT NULL,
-  `bnews_home_team` blob,
-  `bnews_away_team` blob,
-  `game_day_cap_diff` float DEFAULT NULL,
-  `strategies` blob
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `TRADING_JOURNAL`
---
-
-LOCK TABLES `TRADING_JOURNAL` WRITE;
-/*!40000 ALTER TABLE `TRADING_JOURNAL` DISABLE KEYS */;
-/*!40000 ALTER TABLE `TRADING_JOURNAL` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -253,4 +278,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-05-31 15:38:19
+-- Dump completed on 2021-06-01 10:11:17

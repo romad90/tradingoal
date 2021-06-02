@@ -8,6 +8,7 @@
 const mod_async = require('async')
 const mod_assert = require('assert').strict
 const mod_axios = require('axios')
+const config = require('config')
 
 /**
  * Module variables
@@ -15,8 +16,8 @@ const mod_axios = require('axios')
  */
 const logger = require('../logger')
 const headers = {
-  'x-rapidapi-host': 'v3.football.api-sports.io',
-  'x-rapidapi-key': 'a9f6d46c4598107951d83d8aeb3f7d36'
+  'x-rapidapi-host': config.get('rapidapi-host'),
+  'x-rapidapi-key': config.get('rapidapi-key')
 }
 
 /**
@@ -42,7 +43,7 @@ const setTeamId = (opts, cb) => {
     .then(response => {
       const res = response.data.response
       if (res.length !== 1) {
-				logger.warn(`team_id could not be associated a single team. Params: [ name: ${opts.name}, short_name: ${opts.short_name},, country: ${opts.country}]`)
+				console.warn(`team_id could not be associated a single team. Params: [ name: ${opts.name}, short_name: ${opts.short_name},, country: ${opts.country}]`)
 				opts.team_id = -1
         return cb(null, opts)
       }
@@ -51,7 +52,6 @@ const setTeamId = (opts, cb) => {
       return cb(null, opts)
     })
   .catch(err => {
-		logger.error(err)
     return cb(err)
   })
 }
@@ -80,37 +80,33 @@ const searchTeamByName = (opts, cb) => {
 			}) 
     	return cb(null, res)
   	})
-		.catch(err => {
-  		return cb(err)
-		})
+		.catch(() => {})
 }
 
 
-const nextRoundAvailable = (opts, cb) => {
+const getFixtureByDate = (opts, cb) => {
 	mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
 	mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")  
-	mod_assert.ok(typeof opts.league_id === 'number' && opts !== null, "argument 'opts.league_id' must be a number")
-	mod_assert.ok(typeof opts.season === 'number' && opts !== null, "argument 'opts.season' must be an string")
+	mod_assert.ok(typeof opts.league === 'number' && opts !== null, "argument 'opts.league_id' must be a number")
+	mod_assert.ok(typeof opts.date === 'string' && opts !== null, "argument 'opts.date' must be a string")
+	
 	
 	mod_axios
 		.request({
   		method: 'GET',
   		url:'https://v3.football.api-sports.io/fixtures',
   		params: {
-    		search: opts.name,
+				league: opts.league,
+				date: opts.date,
+				season: 2021,
   		},
   		headers
 		})
 		.then(response => {
   		const res = response.data.response
-			res.forEach((_) => {
-				console.log(_)
-			}) 
   		return cb(null, res)
 		})
-		.catch(err => {
-			return cb(err)
-		})
+		.catch(() => {})
 }
 /**
  * Module exports
@@ -119,5 +115,5 @@ const nextRoundAvailable = (opts, cb) => {
 module.exports = {
   setTeamId,
 	searchTeamByName,
-	nextRoundAvailable
+	getFixtureByDate
 }

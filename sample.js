@@ -20,7 +20,7 @@ const footballAPi = require('./src/services/footballAPi.js')
  * Main
  */
 mod_async.series([
-	/*
+	
 	mod_async.apply(
 		WScrapper.parseLeague, {
 			name: 'Campeonato Brasileiro Serie A',
@@ -31,6 +31,7 @@ mod_async.series([
       }
 		}
 	),
+	/*
 	(cb) => {
 		WScrapper.parseTeam({
       league_id: 71,
@@ -72,10 +73,90 @@ mod_async.series([
       url_players: '/se-palmeiras-sao-paulo/startseite/verein/1023/saison_id/2020'
     }),
 		*/
+		/*
 		(cb) => {
-			//get("https://v3.football.api-sports.io/fixtures?next=15");
-			return cb(null, 'A')
+			footballAPi.getFixtureByDate({
+				league: 71,
+				date: '2021-06-06'
+			}, (err, fixtures) => {
+				if (err) return cb(err)
+				mod_async.map(fixtures, function(_, done) {
+					return done(null, {
+						fixture_id:_.fixture.id,
+						date_fixture: _.fixture.date,
+						home_team:_.teams.home.id,
+						away_team:_.teams.away.id,
+						league_id:_.league.id,
+						status: 'pending'
+					})
+				}, function(err, fixtures) {
+					if (err) return cb(err)
+					knex('FIXTURE')
+						.insert(fixtures)
+						.then(cb)
+				  	.catch(console.error)	
+				})
+			})
+		},*/
+		/*
+		(cb) => {
+			const reliabilities = [
+				{
+					league_id: 39,
+					reduction: 1
+				},
+				{
+					league_id: 140,
+					reduction: 2
+				},
+				{
+					league_id: 135,
+					reduction: 2
+				},
+				{
+					league_id: 78,
+					reduction: 1
+				},
+				{
+					league_id: 61,
+					reduction: 3
+				},
+				{
+					league_id: 88,
+					reduction: 4
+				},
+				{
+					league_id: 144,
+					reduction: 4
+				},
+				{
+					league_id: 94,
+					reduction: 3
+				},
+				{
+					league_id: 203,
+					reduction: 4
+				},
+				{
+					league_id: 71,
+					reduction: 3
+				},
+				{
+					league_id: 128,
+					reduction: 4
+				},
+				{
+					league_id: 40,
+					reduction: 3
+				},
+			]
+				
+			knex('RELIABILITY')
+				.insert(reliabilities)
+				.then(cb)
+				  .catch(console.error)	
 		},
+	*/
 	/*
 	(cb) => {
 		(async () => {

@@ -6,7 +6,7 @@
   "author": "Rode",
   "license": "MIT",
   "bin": {
-    "tradingoal": "./bin/index.js"
+    "eft": "./bin/index.js"
   },
   "scripts": {
     "dev": "NODE_ENV=dev && ./node_modules/.bin/nodemon --trace-warnings sample.js | ./node_modules/.bin/pino-pretty -c -l"
@@ -19,6 +19,7 @@
     "cheerio": "^1.0.0-rc.9",
     "cheerio-tableparser": "^1.0.1",
     "clear": "^0.1.0",
+    "config": "^3.3.6",
     "configstore": "^6.0.0",
     "figlet": "^1.5.0",
     "inquirer": "^8.1.0",
@@ -27,6 +28,7 @@
     "minimist": "^1.2.5",
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.7",
+    "ora": "^5.4.0",
     "pino": "^6.11.3",
     "pino-pretty": "^4.8.0",
     "properties-reader": "^2.2.0",
