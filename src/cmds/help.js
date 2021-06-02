@@ -32,9 +32,7 @@ ${mod_chalk.greenBright('eft init <options>')}
   status: `
 ${mod_chalk.greenBright('eft status <options>')}
 
-  --league, -l ......... shows the status of installed leagues data.
-  --team, -t ........... shows the status of installed teams data.
-  --player, -p ......... shows the status of installed players data.
+  --league, -l ......... shows the status of teams, players installed per league.
 `,
 
   run: `

@@ -1,6 +1,13 @@
 {
   "rapidapi-host": "v3.football.api-sports.io",
   "rapidapi-key": "a9f6d46c4598107951d83d8aeb3f7d36",
+  "threshold": {
+      "71" : {
+        "name_league" : "Campeonato Brasileiro Serie A",
+        "number_teams_expected": 20,
+        "number_players_expected": 738
+      }
+  },
   "patch": {
     "team_name" : {
       "brazil": {

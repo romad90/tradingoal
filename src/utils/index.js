@@ -5,6 +5,7 @@
  * @private
  *
  */
+const autoBind = require('auto-bind')
 const mod_async = require('async')
 const mod_assert = require('assert').strict
 const mysql = require('mysql2')  
@@ -36,7 +37,7 @@ function randomIntFromInterval(min, max) { // min and max included
  */
 class Utils {
   constructor() {
-
+     autoBind(this)
   }
 
   isMySQLUp(cb) {
@@ -150,6 +151,76 @@ class Utils {
         .catch(() => {})
 			})
 		}, randomIntFromInterval(MIN, MAX))  
+  }
+  
+  getLeagueAvailable(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    
+	  knex('LEAGUE')
+    .select('*')
+	  .then((leagues) => {
+	    return cb(null, leagues)
+	  })
+    .catch(() => {})
+  }
+  
+  getTeamNumberByLeagueId(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object") 
+    mod_assert.ok(typeof opts.league_id === 'number' && opts !== null, "arguments 'opts.league_id' must be a number")
+    
+    knex('TEAM')
+	  .select('*')
+    .where({league_id: opts.league_id})
+	  .then((teams) => {
+		  return cb(null, teams.length)
+    })
+    .catch(() => {})
+  }
+  
+  getPlayerNumberByLeagueId(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object") 
+    mod_assert.ok(typeof opts.league_id === 'number' && opts !== null, "arguments 'opts.league_id' must be a number")
+    
+    knex.from('PLAYER')
+    .innerJoin('TEAM', 'TEAM.team_id', 'PLAYER.team_id')
+    .where('TEAM.league_id', opts.league_id)
+	  .then((players) => {
+		  return cb(null, players.length)
+    })
+    .catch(() => {})
+  }
+  
+  getThresholdByLeagueId(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object") 
+    mod_assert.ok(typeof opts.league_id === 'number' && opts !== null, "arguments 'opts.league_id' must be a number")
+        
+    mod_async.parallel([
+      mod_async.apply(this.getTeamNumberByLeagueId, opts),
+      mod_async.apply(this.getPlayerNumberByLeagueId, opts)
+    ], (err, results) => {
+      if (err) return cb(err)
+      const [number_teams, number_players] = results
+      const number_teams_expected = config.get('threshold')[opts.league_id].number_teams_expected || 'undefined'
+      const number_players_expected = config.get('threshold')[opts.league_id].number_players_expected || 'undefined'
+        
+      return cb(null, {
+        [opts.league_id]: {
+          name: opts.league_name,
+          country: opts.country,
+          current: {
+            number_teams,
+            number_players
+          },
+          expected: {
+            number_teams: number_teams_expected,
+            number_players:number_players_expected
+          }
+        }
+      })  
+    })
   }
 }
 

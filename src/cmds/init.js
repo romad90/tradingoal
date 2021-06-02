@@ -22,7 +22,6 @@ const logger = require('../logger')
 
 module.exports = (args) => {
 	let opts
-  const spinner = mod_ora().start('Importation in progress...')
 	
 	if (!args.a && !args.all && !args.c) mod_process.exit(0) 
 	if (args.a || args.all) {
@@ -32,10 +31,11 @@ module.exports = (args) => {
 		opts = args.c || args.country
 		if (typeof opts !== 'string') {
 			console.log('country is mandatory')
-      spinner.fail()
 			mod_process.exit(1)
 		} 
 	}
+  
+  const spinner = mod_ora().start('Importation in progress...')
 	  
 	mod_async.waterfall([
 		(done) => {
