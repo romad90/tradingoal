@@ -82,7 +82,7 @@ class Utils {
 		
 		if (!opts) {
 			/**
-			 * By default, all pre-listed leagues will be there.
+			 * By default, all pre-listed leagues will be there, but no recommended.
 			 */
 			Object.entries(_).forEach(([key, value]) => {
 				extraLeagueInformations = extraLeagueInformations.concat(_[key])

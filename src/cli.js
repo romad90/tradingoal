@@ -32,8 +32,8 @@ module.exports = (argsArray) => {
       require('./cmds/help')(args)
       break
 
-    case 'init':
-      require('./cmds/init')(args)
+    case 'import':
+      require('./cmds/import')(args)
       break
 
     case 'run':
@@ -47,7 +47,7 @@ module.exports = (argsArray) => {
     case 'status':
       require('./cmds/status')(args)
       break
-
+      
     default:
       console.error(`"${cmd}" is not a valid command!`)
       break

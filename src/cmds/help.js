@@ -16,31 +16,25 @@ const menus = {
   main: `
 ${mod_chalk.greenBright('eft [command] <options>')}
 
-  ${mod_chalk.blueBright('init')} ................ manage the datasets mandatory
-  ${mod_chalk.blueBright('status')} .............. show the datasets status
+  ${mod_chalk.blueBright('import')} .............. import a dataset for a pre-determined country
+  ${mod_chalk.blueBright('status')} .............. show the datasets status, of a specific league
   ${mod_chalk.blueBright('fixture')} ............. set up the requirements for the trading journal creation
   ${mod_chalk.blueBright('run')}.................. create the journal trading specifying the league and the date of the fixture
   ${mod_chalk.blueBright('version')} ............. show package version
+  ${mod_chalk.blueBright('test')} ................ test experimentation
   ${mod_chalk.blueBright('help')} ................ show help menu for a command
 `,
 
-  init: `
-${mod_chalk.greenBright('eft init <options>')}
-	--country, -c ........... set up specific leagues, by country.
-	--all, -a ............... set up leagues, teams and players datasets.
+  import: `
+${mod_chalk.greenBright('eft import')} ${mod_chalk.whiteBright('<no-options>')}
 `,
 
   status: `
-${mod_chalk.greenBright('eft status <options>')}
-
-  --league, -l ......... [Required] shows the status of teams, players installed per league.
-`,
+${mod_chalk.greenBright('eft status')} ${mod_chalk.whiteBright('<no-options>')}
+`,  
 
   fixture: `
-${mod_chalk.greenBright('eft fixture <options>')}
-  --action, -a ......... determine action to perform [add, ls].
-  --league, -l ......... shows the status of teams, players installed per league.
-  --date, -d ........... [Required] shows the status of teams, players installed per league.
+ ${mod_chalk.greenBright('eft fixture')} ${mod_chalk.whiteBright('<no-options>')}
 `,
 
   run: `

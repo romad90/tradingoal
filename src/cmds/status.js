@@ -15,22 +15,7 @@ const mod_process = require('process')
  */
 const Utils = require('../utils')
 
-module.exports = (args) => {
-	const opts = {} 
-  	
-	if (!args.l && !args.league) {
-			console.log('-l or --league is the only option available.')
-	    mod_process.exit(0) 
-	}
-  
-	if (args.l || args.league) {
-		opts.league_id = args.l || args.league
-		if (typeof opts.league_id !== 'number') {
-			console.log('league is mandatory, and must be a number.')
-			mod_process.exit(1)
-		} 
-	}
-  
+module.exports = () => {  
   const spinner = mod_ora().start('Loading...')
     
   mod_async.waterfall([
