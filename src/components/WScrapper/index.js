@@ -265,8 +265,6 @@ class WScrapper {
   }
 
   parsePlayer(opts, cb) {
-    console.log('---')
-    console.log(opts)
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(typeof opts.url_players === 'string' && opts.url_players !== null, "argument 'opts.players' must be an string")

@@ -134,18 +134,14 @@ class Utils {
 	}
 
   populatedPlayer (opts, cb) {
-    console.log('INSIDE - populatedPlayer()')
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
     mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object") 
     mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
     mod_assert.ok(typeof opts.url_players === 'string' && opts !== null, "arguments 'opts.url_players' must be a string")
 		
 		setTimeout(function(){
-      console.log(opts)
 			WScrapper.parsePlayer(opts, (err, players) => {
 			  if (err) return cb(err)
-        console.log('just before the insert')
-        console.log(players) 
 			  knex('PLAYER')
 				  .insert(players)
 				  .then(() => {

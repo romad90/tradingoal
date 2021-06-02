@@ -1,6 +1,22 @@
 {
   "rapidapi-host": "v3.football.api-sports.io",
   "rapidapi-key": "a9f6d46c4598107951d83d8aeb3f7d36",
+  "patch": {
+    "team_name" : {
+      "brazil": {
+        "Athletico-PR": "Atletico Paranaense",
+        "Chapecoense": "Chapecoense-sc",
+        "EC Bahia": "Bahia",
+        "Santos FC": "Santos",
+        "Cuiabá-MT": "Cuiaba",
+        "Ceará SC": "Ceara",
+        "América-MG": "America Mineiro",
+        "Atlético-GO": "Atletico Goianiense",
+        "Fortaleza": "Fortaleza EC",
+        "RB Bragantino": "Bragantino"
+      }
+    }
+  },
   "mysql": {
     "connectionLimit": 10,
     "host": "127.0.0.1",

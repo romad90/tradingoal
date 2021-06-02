@@ -14,6 +14,7 @@ const config = require('config')
  * Module variables
  * @private
  */
+const patch = config.get('patch')
 const logger = require('../logger')
 const headers = {
   'x-rapidapi-host': config.get('rapidapi-host'),
@@ -30,12 +31,16 @@ const setTeamId = (opts, cb) => {
   mod_assert.ok(typeof opts.short_name === 'string' && opts !== null, "argument 'opts.short_name' must be an string")
   mod_assert.ok(typeof opts.country === 'string' && opts !== null, "argument 'opts.country' must be an string")
 	
+  //Necessary, cause data may differs between two differenys datasets.
+  opts.short_name = patch['team_name'][opts.country.toLowerCase()][opts.short_name] || opts.short_name
+  const patch_name = patch['team_name'][opts.country.toLowerCase()][opts.short_name]
+  
   mod_axios
     .request({
       method: 'GET',
       url:'https://v3.football.api-sports.io/teams',
       params: {
-        name: opts.short_name,
+        name: opts.short_name,          //to be adjusting, according the league.
 				country: opts.country
       },
       headers
