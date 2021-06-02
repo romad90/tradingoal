@@ -94,7 +94,7 @@ const getFixtureByDate = (opts, cb) => {
 	mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")  
 	mod_assert.ok(typeof opts.league === 'number' && opts !== null, "argument 'opts.league_id' must be a number")
 	mod_assert.ok(typeof opts.date === 'string' && opts !== null, "argument 'opts.date' must be a string")
-	
+	mod_assert.ok(typeof opts.season === 'number' && opts !== null, "argument 'opts.season' must be a number")
 	
 	mod_axios
 		.request({
@@ -103,7 +103,7 @@ const getFixtureByDate = (opts, cb) => {
   		params: {
 				league: opts.league,
 				date: opts.date,
-				season: 2021,
+				season: opts.season,
   		},
   		headers
 		})

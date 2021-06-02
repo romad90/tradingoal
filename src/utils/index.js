@@ -222,6 +222,26 @@ class Utils {
       })  
     })
   }
+  
+  prepFixture(opts) {
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.league.id === 'number' && opts !== null, "arguments 'opts.league_id' must be a number") 
+    mod_assert.ok(typeof opts.fixture.id === 'number' && opts !== null, "arguments 'opts.fixture.id' must be a number")
+    mod_assert.ok(typeof opts.fixture.date === 'string' && opts !== null, "arguments 'opts.fixture.date' must be a string")
+    mod_assert.ok(typeof opts.fixture.timezone === 'string' && opts !== null, "arguments 'opts.fixture.timezone' must be a string")
+    mod_assert.ok(typeof opts.teams.home.id === 'number' && opts !== null, "arguments 'opts.teams.home.id' must be a number")
+    mod_assert.ok(typeof opts.teams.away.id === 'number' && opts !== null, "arguments 'opts.teams.away.id' must be a number")
+        
+    return {
+      league_id: opts.league.id,
+      fixture_id: opts.fixture.id,
+      date_fixture: opts.fixture.date,
+      timezone: opts.fixture.timezone,
+      home_team: opts.teams.home.id,
+      away_team: opts.teams.away.id,
+      status: 'pending'
+    }
+  }
 }
 
 module.exports = new Utils()

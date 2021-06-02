@@ -39,6 +39,10 @@ module.exports = (argsArray) => {
     case 'run':
       require('./cmds/run')(args)
       break
+      
+    case 'fixture':
+      require('./cmds/fixture')(args)
+      break
 
     case 'status':
       require('./cmds/status')(args)

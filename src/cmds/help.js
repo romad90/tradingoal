@@ -16,11 +16,12 @@ const menus = {
   main: `
 ${mod_chalk.greenBright('eft [command] <options>')}
 
-  ${mod_chalk.blueBright('init')} ............... manage the datasets mandatory
-  ${mod_chalk.blueBright('status')} ............. show the datasets status 
-  ${mod_chalk.blueBright('run')}................. create the journal trading specifying the league and the date of the fixture
-  ${mod_chalk.blueBright('version')} ............ show package version
-  ${mod_chalk.blueBright('help')} ............... show help menu for a command
+  ${mod_chalk.blueBright('init')} ................ manage the datasets mandatory
+  ${mod_chalk.blueBright('status')} .............. show the datasets status
+  ${mod_chalk.blueBright('fixture')} ............. set up the requirements for the trading journal creation
+  ${mod_chalk.blueBright('run')}.................. create the journal trading specifying the league and the date of the fixture
+  ${mod_chalk.blueBright('version')} ............. show package version
+  ${mod_chalk.blueBright('help')} ................ show help menu for a command
 `,
 
   init: `
@@ -32,7 +33,14 @@ ${mod_chalk.greenBright('eft init <options>')}
   status: `
 ${mod_chalk.greenBright('eft status <options>')}
 
+  --league, -l ......... [Required] shows the status of teams, players installed per league.
+`,
+
+  fixture: `
+${mod_chalk.greenBright('eft fixture <options>')}
+  --action, -a ......... determine action to perform [add, ls].
   --league, -l ......... shows the status of teams, players installed per league.
+  --date, -d ........... [Required] shows the status of teams, players installed per league.
 `,
 
   run: `
