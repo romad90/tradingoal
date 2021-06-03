@@ -15,24 +15,15 @@
     "async": "^3.2.0",
     "auto-bind": "^4.0.0",
     "axios": "^0.21.1",
-    "boxen": "^5.0.1",
-    "chalk": "^4.1.1",
     "cheerio": "^1.0.0-rc.9",
-    "cheerio-tableparser": "^1.0.1",
-    "clear": "^0.1.0",
+    "commander": "^7.2.0",
     "config": "^3.3.6",
-    "configstore": "^6.0.0",
-    "figlet": "^1.5.0",
     "inquirer": "^8.1.0",
     "knex": "^0.95.6",
-    "lodash": "^4.17.21",
-    "minimist": "^1.2.5",
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.7",
     "ora": "^5.4.0",
     "pino": "^6.11.3",
-    "pino-pretty": "^4.8.0",
-    "properties-reader": "^2.2.0",
-    "puppeteer": "^9.1.1"
+    "pino-pretty": "^4.8.0"
   }
 }
