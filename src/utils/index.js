@@ -348,7 +348,7 @@ class Utils {
       timezone: opts.fixture.timezone,
       home_team: opts.teams.home.id,
       away_team: opts.teams.away.id,
-      status: 'pending'
+      status: 'not_started'
     }
   }
   
@@ -459,9 +459,15 @@ class Utils {
     .catch(() => {})
   }
   
-  //TODO: yet to finish
-  calculateStrategy(opts, cb) {
-    // TODO: Determine the strategy
+  getAllStrategy(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+ 
+    knex('STRATEGY')
+    .select('*')
+	  .then((strategy) => {
+	    return cb(null, strategy)
+	  })
+    .catch(() => {})
   }
 }
 

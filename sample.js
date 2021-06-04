@@ -258,10 +258,8 @@ mod_async.series([
 			})
 		})
 	}*/
-    (cb) => {
-      /**
-      Bookmaker
-      **/
+   /* (cb) => {
+
       const options = {
         method: 'GET',
         url: 'https://v3.football.api-sports.io/fixtures',
@@ -271,6 +269,37 @@ mod_async.series([
           league: 188, 
           season: 2021,
           date: '2021-06-03',
+        },
+        headers: {
+          'x-rapidapi-host': 'v3.football.api-sports.io',
+          'x-rapidapi-key': 'a9f6d46c4598107951d83d8aeb3f7d36'
+        }
+      }
+	  
+      mod_axios
+  		.request(options)
+    	.then(response => {
+        console.log(response)
+      	response.data.response.forEach((_) => {
+      	  console.log(_)
+      	})
+      	return cb(null)
+    	})
+  		.catch(() => {})
+    }*/
+    (cb) => {
+      /**
+      Bookmaker
+      **/
+      const options = {
+        method: 'GET',
+        url: 'https://v3.football.api-sports.io/odds',
+        params: {
+          //id: 688920,
+          //bookmaker: 3
+          league: 71, 
+          season: 2021,
+          date: '2021-06-06',
         },
         headers: {
           'x-rapidapi-host': 'v3.football.api-sports.io',
