@@ -1,6 +1,11 @@
 {
   "rapidapi-host": "v3.football.api-sports.io",
   "rapidapi-key": "a9f6d46c4598107951d83d8aeb3f7d36",
+  "bookmaker": {
+    "id": 3,
+    "name": "Betfair",
+    "url_source": "https://www.api-football.com/documentation-v3#operation/get-bookmakers"
+  },
   "threshold": {
       "71" : {
         "name_league" : "Campeonato Brasileiro Serie A",

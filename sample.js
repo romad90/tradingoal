@@ -216,19 +216,8 @@ mod_async.series([
 	},
 	*/
 	//mod_async.apply(footballAPi.searchTeamByName, {name:'Ceara'})
-  (cb) => {
-    /**
-     * Params: [ name: Club Athletico Paranaense, short_name: Athletico-PR,, country: Brazil], corr: Atletico Paranaense
-     * Params: [ name: Associação Chapecoense de Futebol, short_name: Chapecoense,, country: Brazil], corr:
-     * Params: [ name: Esporte Clube Bahia, short_name: EC Bahia,, country: Brazil], corr:
-     * Params: [ name: Santos FC, short_name: Santos FC,, country: Brazil], corr:
-     * Params: [ name: Cuiabá Esporte Clube (MT), short_name: Cuiabá-MT,, country: Brazil], corr:
-     * Params: [ name: Ceará Sporting Club, short_name: Ceará SC,, country: Brazil], corr:
-     * Params: [ name: América Futebol Clube (MG), short_name: América-MG,, country: Brazil], corr:
-     * Params: [ name: Atlético Clube Goianiense, short_name: Atlético-GO,, country: Brazil], corr:
-     * Params: [ name: Fortaleza Esporte Clube, short_name: Fortaleza,, country: Brazil], corr:
-     * Params: [ name: Red Bull Bragantino, short_name: RB Bragantino,, country: Brazil], corr:
-     */
+  /*(cb) => {
+    
     const options = {
       method: 'GET',
       url: 'https://v3.football.api-sports.io/teams',
@@ -269,6 +258,37 @@ mod_async.series([
 			})
 		})
 	}*/
+    (cb) => {
+      /**
+      Bookmaker
+      **/
+      const options = {
+        method: 'GET',
+        url: 'https://v3.football.api-sports.io/fixtures',
+        params: {
+          id: 688920,
+          //bookmaker: 3
+          //league: 71, 
+          //season: 2021
+          //date: '2021-06-05',
+        },
+        headers: {
+          'x-rapidapi-host': 'v3.football.api-sports.io',
+          'x-rapidapi-key': 'a9f6d46c4598107951d83d8aeb3f7d36'
+        }
+      }
+	  
+      mod_axios
+  		.request(options)
+    	.then(response => {
+        //console.log(response)
+      	response.data.response.forEach((_) => {
+      	  console.log(_)
+      	})
+      	return cb(null)
+    	})
+  		.catch(() => {})
+    }
 ], (err, results) => {
     if (err) throw err
     console.log(results)

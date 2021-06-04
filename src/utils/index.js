@@ -28,8 +28,27 @@ const pool = mysql.createPool({
   password: config.get('mysql.password'),
   database: config.get('mysql.database')
 })
-function randomIntFromInterval(min, max) { // min and max included 
+const randomIntFromInterval = (min, max) => {
+    mod_assert.ok(typeof min === 'number', "argument 'min' must be a number")
+    mod_assert.ok(typeof max === 'number', "argument 'max' must be a number")
   return Math.floor(Math.random() * (max - min + 1) + min)
+}
+const getPctMarketCapValue = function getPctMarketCapValue (total_market_value, market_value_player) {
+    mod_assert.ok(typeof total_market_value === 'number', "argument 'total_market_value' must be a number")
+    mod_assert.ok(total_market_value !== null, "total_market_value cannot be null")
+    mod_assert.ok(typeof market_value_player === 'number', "argument 'market_value_player' must be a number")
+    mod_assert.ok(market_value_player !== null, "market_value_player cannot be null")
+    
+    return 100 * market_value_player / total_market_value
+}
+
+const getPctTeamMarketDiff = function getPctTeamMarketDiff (higher_market_value, lower_market_value) {
+    mod_assert.ok(typeof higher_market_value === 'number', "argument 'higher_market_value' must be a number")
+    mod_assert.ok(higher_market_value !== null, "higher_market_value cannot be null")
+    mod_assert.ok(typeof lower_market_value === 'number', "argument 'lower_market_value' must be a number")
+    mod_assert.ok(lower_market_value !== null, "lower_market_value cannot be null")
+    
+    return 100 * higher_market_value / lower_market_value
 }
 
 /**
@@ -58,19 +77,6 @@ class Utils {
       if (err) return cb(err)
       if (rows.length === 0) return cb(null, false)
       cb(null, true)
-    })
-  }
-
-  isTableEmpty (opts = {}, cb) {
-    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
-    mod_assert.ok(typeof pool === 'object' && pool !== null, "'pool' must be an object")
-    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
-    mod_assert.ok(typeof opts.table === 'string' && opts.table !== null, "arguments 'opts.table' must be a string")
-
-    pool.query(`select * from ${opts.table};`, (err, rows) => {
-      if (err) return cb(err)
-      if (rows.length === 0) return cb(null, true)
-      cb(null, false)
     })
   }
   
@@ -153,6 +159,46 @@ class Utils {
 		}, randomIntFromInterval(MIN, MAX))  
   }
   
+  // TODO: yet to inspect and adjust
+  searchPlayerByName(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object") 
+    mod_assert.ok(typeof opts.team_id === 'number', "arguments 'opts.team_id' must be a number")
+    mod_assert.ok(typeof opts.name === 'string', "arguments 'opts.string' must be a string")
+    
+	  knex('PLAYER')
+    .where('name', 'like', `%${opts.name}%`)
+    .andWhere('team_id', opts.team_id)
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
+  getAllFixtureNotStartedYet(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+     
+	  knex('FIXTURE')
+    .where('status', 'not_started')
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
+  getFixtureById(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+     
+	  knex('FIXTURE')
+    .where('fixture_id', opts.fixture_id)
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
   getLeagueAvailable(cb) {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
     
@@ -174,6 +220,19 @@ class Utils {
     .where({league_id: opts.league_id})
 	  .then((teams) => {
 		  return cb(null, teams.length)
+    })
+    .catch(() => {})
+  }
+  
+  getTeamById(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object") 
+    mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
+    
+    knex('TEAM')
+    .where({team_id: opts.team_id})
+	  .then((_) => {
+		  return cb(null, _.pop())
     })
     .catch(() => {})
   }
@@ -241,6 +300,118 @@ class Utils {
       away_team: opts.teams.away.id,
       status: 'pending'
     }
+  }
+  
+  //TODO: yet to inspect and adjust
+  reAdjustMarketCapTeam(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
+    mod_assert.ok(typeof opts.total_market_value === 'number' && opts.total_market_value !== null, "arguments 'opts.total_market_value' must be a number") 
+    mod_assert.ok(Array.isArray(opts.bnews), "arguments 'opts.bnews' must be an array") 
+    
+    let bnews = opts.bnews
+    let total_missing_players_market_value = 0
+        
+    if (bnews.length === 0) {
+      return cb(null, opts)
+    } 
+      
+    mod_async.map(bnews, (_, callback) => {
+      this.searchPlayerByName(_, (err, player) => {
+        if (err) return callback(err)
+        if (player.market_value_unit === 'th') player.market_value = player.market_value % 1000
+        total_missing_players_market_value += player.market_value
+        player.pctValue = getPctMarketCapValue(opts.total_market_value, player.market_value)
+          if (player.pctValue >= 10)
+            player.keyNews = `Beware: ${player.name} represents ${player.pctValue} of the total market value team.` 
+        callback(null, player)
+      })
+    }, (err, bnewsUpdated) => {
+      if (err) return cb(err)
+      opts.bnews = bnewsUpdated
+      opts.total_market_value = (opts.total_market_value - total_missing_players_market_value)
+      cb (null, opts)
+    })
+  }
+  
+  preHomeworkPerTeam (opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.fixture_id === 'number' && opts.fixture_id !== null, "arguments 'opts.fixture_id' must be a number") 
+    mod_assert.ok(typeof opts.team_id === 'number' && opts.team_id !== null, "arguments 'opts.team_id' must be a number") 
+      
+    mod_async.waterfall([
+      mod_async.apply(this.getTeamById, opts),
+      (_, done) => {
+        opts.total_market_value = _.total_market_value
+        done(null, opts)
+      },
+      (_, done) => {
+        footballAPi.getInjuriesByTeam(_, (err, data) => {
+          if (err) return done(err)
+          _.bnews = data
+          return done(null, _)
+        })
+      },
+      this.reAdjustMarketCapTeam,
+    ], (err, _) => {
+      if (err) return cb(err)
+      cb(null, _)
+    }) 
+  }
+  
+  //TODO: yet to be adjusted, when API providing data
+  prepHomework(teams, cb) {
+    mod_assert.ok(Array.isArray(teams), "arguments 'teams' must be an object")
+    mod_assert.ok(teams.length === 2, "arguments 'teams' must contain two items")
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    
+    const fixture_id = teams[0].fixture_id
+    
+    footballAPi.getOddsByFixtureId({
+      fixture_id: fixture_id
+    }, (err, odds) => {
+      if (err) return cb(err)
+      const [home_team, away_team] =  teams        
+      const homework = {
+        fixture_id: home_team.fixture_id,
+        bookmaker_id: config.get('bookmaker.id'),
+        diff_market_cap: (home_team.total_market_value > away_team.total_market_value) ? getPctTeamMarketDiff(home_team.total_market_value, away_team.total_market_value) : getPctTeamMarketDiff(away_team.total_market_value, home_team.total_market_value),
+        updated_at: knex.fn.now()
+      }
+      const [home_odds, away_odds] = odds      
+      if (home_odds && away_odds) {
+        homework.home_odds = home_odds
+        homework.away_odds = away_odds
+        homework.favorite = home_odds
+        homework.underdog = away_odds
+        if (home_odds > away_odds) [home_odds, away_odds] = [away_odds, home_odds]
+      }
+      if (home_team.bnews && home_team.bnews.length > 0) {
+        homework.home_bnews = home_team.bnews
+      }
+      if (away_team.bnews && away_team.bnews.length > 0) {
+        homework.away_bnews = away_team.bnews
+      }
+      return cb(null, homework)
+    })
+  }
+  
+  addHomework(homeworks, cb) {
+    knex("HOMEWORK")
+      .insert(homeworks)
+      .onConflict("fixture_id")
+      .merge()
+    .then(_ => {
+      return cb(null) 
+    })
+    .catch(() => {})
+  }
+  
+  //TODO: yet to finish
+  calculateStrategy(opts, cb) {
+    // TODO: Determine the strategy
   }
 }
 

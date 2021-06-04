@@ -6,7 +6,7 @@
   "author": "Rode",
   "license": "MIT",
   "bin": {
-    "eft": "./bin/index.js"
+    "eft": "./bin/index.js --use-strict --expose-inspector-scripts"
   },
   "scripts": {
     "dev": "NODE_ENV=dev && ./node_modules/.bin/nodemon --trace-warnings sample.js | ./node_modules/.bin/pino-pretty -c -l"

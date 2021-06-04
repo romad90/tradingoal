@@ -2,8 +2,57 @@
 
 /**
  * Module dependencies
+ * @private
+ */
+
+const mod_async = require('async')
+const mod_inquirer = require('inquirer')
+const mod_ora = require('ora')
+const mod_process = require('process')
+
+/**
+ * Module variables
+ * @private
+ */
+
+const Utils = require('../utils')
+const knex = require('../knex.js')
+
+/**
+ * Module exports
  * @public
  */
-module.exports = (args) => {
-	console.log('RUN')
+
+// TODO: yet to inspect and adjust
+module.exports = () => {
+  let spinner
+  mod_async.waterfall([
+    Utils.getAllFixtureNotStartedYet, // TODO: create a routine to set status to end, 2h after the date of the match. not_started, pending, finished
+    (fixturesNotStartedYet, done) => {
+      if (fixturesNotStartedYet.length === 0) return done(new Error('no fixtures have been found, please go fetch them first.'))
+      spinner = mod_ora().start(`Doing homeworks, on fixtures available: [${fixturesNotStartedYet.length}] found.`)
+      mod_async.map(fixturesNotStartedYet, (_, callback) => {
+        mod_async.parallel([
+          mod_async.apply(Utils.preHomeworkPerTeam, {
+            fixture_id: _.fixture_id,
+            team_id: _.home_team,
+            league_id: _.league_id
+          }),
+          mod_async.apply(Utils.preHomeworkPerTeam, {
+            fixture_id: _.fixture_id,
+            team_id: _.away_team,
+            league_id: _.league_id
+          })
+        ], callback)
+      }, done)
+    },
+    (_, done) => {
+       mod_async.map(_, Utils.prepHomework, done)
+    },
+    Utils.addHomework
+  ], (err) => {
+    if (err) throw (err)
+    spinner.succeed()
+    mod_process.exit(1)
+  })
 }
