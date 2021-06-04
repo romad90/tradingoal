@@ -19,7 +19,7 @@ const Utils = require('../utils')
 const knex = require('../knex.js')
 
 /**
- * Module exports
+ * Module export
  * @public
  */
 

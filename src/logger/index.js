@@ -1,13 +1,13 @@
 'use strict'
 
 /**
- * Modules dependencies
+ * Module dependencies
  * @private
  */
 const logger = require('pino')()
 
 /**
- * Modules export
+ * Module export
  * @public
  */
 

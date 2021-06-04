@@ -1,7 +1,7 @@
 'use strict'
 
 /**
- * Modules dependencies
+ * Module dependencies
  * @private
  */
 
@@ -11,7 +11,7 @@ const mod_cheerio = require('cheerio')
 const mod_crypto = require('crypto')
 
 /**
- * Modules variables
+ * Module variables
  * @private
  */
 
@@ -49,7 +49,8 @@ const rValueAsExpected = (opts) => {
 }
 
 /**
- *
+ * module Handle webscrapping on Transfermarkt
+ * @module WScrapper
  */
 
 class WScrapper {
@@ -329,5 +330,10 @@ class WScrapper {
       .catch(() => {})
   }
 }
+
+/**
+ * Module export
+ * @public
+ */
 
 module.exports = new WScrapper()

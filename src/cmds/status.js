@@ -13,7 +13,13 @@ const mod_process = require('process')
  * Module variables
  * @private
  */
+
 const Utils = require('../utils')
+
+/**
+ * Module export
+ * @public
+ */
 
 module.exports = () => {  
   const spinner = mod_ora().start('Loading...')

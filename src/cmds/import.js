@@ -21,6 +21,11 @@ const footballAPi = require('../services/footballAPi.js')
 const Utils = require('../utils')
 const logger = require('../logger')
 
+/**
+ * Module export
+ * @public
+ */
+
 module.exports = () => {
   mod_inquirer
     .prompt([

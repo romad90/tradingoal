@@ -5,6 +5,7 @@
  * @private
  *
  */
+
 const autoBind = require('auto-bind')
 const mod_async = require('async')
 const mod_assert = require('assert').strict
@@ -15,6 +16,7 @@ const config = require('config')
  * Module variables
  * @private
  */
+
 const MIN = 2500
 const MAX = 8000
 const WScrapper = require('../components/WScrapper')
@@ -52,9 +54,14 @@ const getPctTeamMarketDiff = function getPctTeamMarketDiff (higher_market_value,
 }
 
 /**
- * Main
+ * Module Manage transactions over MySQL data.
+ * @module Utils
  */
 class Utils {
+  
+  /**
+   * constructor 
+   */
   constructor() {
      autoBind(this)
   }

@@ -19,6 +19,11 @@ const knex = require('../knex.js')
 const footballAPi = require('../services/footballAPi.js')
 const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/
 
+/**
+ * Module export
+ * public
+ */
+
 module.exports = () => {
   
   const _ = {

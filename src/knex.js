@@ -1,11 +1,17 @@
 'use strict'
 
 /**
- * Modules dependencies
+ * Module dependencies
  * @private
  *
  */
+
 const config = require('config')
+
+/**
+ * Module variables
+ * @private
+ */
 
 const opts = {
 	client: 'mysql2',
@@ -32,5 +38,9 @@ const opts = {
 		}
 	}
 }
-	
+
+/**
+ * Module exports
+ * @public
+ */
 module.exports = require('knex')(opts)
