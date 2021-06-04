@@ -266,11 +266,11 @@ mod_async.series([
         method: 'GET',
         url: 'https://v3.football.api-sports.io/fixtures',
         params: {
-          id: 688920,
+          //id: 688920,
           //bookmaker: 3
-          //league: 71, 
-          //season: 2021
-          //date: '2021-06-05',
+          league: 188, 
+          season: 2021,
+          date: '2021-06-03',
         },
         headers: {
           'x-rapidapi-host': 'v3.football.api-sports.io',
@@ -281,7 +281,7 @@ mod_async.series([
       mod_axios
   		.request(options)
     	.then(response => {
-        //console.log(response)
+        console.log(response)
       	response.data.response.forEach((_) => {
       	  console.log(_)
       	})
@@ -291,5 +291,4 @@ mod_async.series([
     }
 ], (err, results) => {
     if (err) throw err
-    console.log(results)
 })

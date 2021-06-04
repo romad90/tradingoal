@@ -193,6 +193,49 @@ class Utils {
     .catch(() => {})
   }
   
+  getAllFixtureInPending(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+     
+	  knex('FIXTURE')
+    .where('status', 'pending')
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
+  updateFixtureToInPending(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+    
+    knex('fixture')
+      .where('fixture_id', '=', opts.fixture_id)
+      .update({
+        status: 'pending',
+    })
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
+  updateFixtureToFinished(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+    
+    knex('fixture')
+      .where('fixture_id', '=', opts.fixture_id)
+      .update({
+        status: 'finished',
+    })
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
   getFixtureById(opts, cb) {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")

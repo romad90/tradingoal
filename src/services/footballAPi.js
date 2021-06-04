@@ -159,6 +159,21 @@ const getInjuriesByTeam = (opts, cb) => {
 	.catch(() => {})
 }
 
+const getLiveFixtures = (fixtureIds, cb) => {
+  mod_assert.ok(typeof fixtureIds === 'string' && opts !== null, "arguments 'fixtureIds' must be a string")
+    
+  mod_axios
+  .request({
+	  method: 'GET',
+	  url: `https://${config.get('rapidapi-host')}/fixtures?live=${fixtureIds}`,
+    headers
+  })
+  .then(_ => {
+	  return cb(null, _.data.response)
+  })
+  .catch(() => {})
+} 
+
 /**
  * Module exports
  * @public
@@ -168,5 +183,6 @@ module.exports = {
 	searchTeamByName,
 	getFixtureByDate,
   getOddsByFixtureId,
-  getInjuriesByTeam
+  getInjuriesByTeam,
+  getLiveFixtures
 }
