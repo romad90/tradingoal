@@ -258,17 +258,18 @@ mod_async.series([
 			})
 		})
 	}*/
-   /* (cb) => {
+    /*
+   (cb) => {
 
       const options = {
         method: 'GET',
-        url: 'https://v3.football.api-sports.io/fixtures',
+        url: 'https://v3.football.api-sports.io/injuries',
         params: {
-          //id: 688920,
+          fixture: 688919,
           //bookmaker: 3
-          league: 188, 
-          season: 2021,
-          date: '2021-06-03',
+          //league: 188, 
+          //season: 2021,
+          //date: '2021-06-03',
         },
         headers: {
           'x-rapidapi-host': 'v3.football.api-sports.io',
@@ -286,20 +287,19 @@ mod_async.series([
       	return cb(null)
     	})
   		.catch(() => {})
-    }*/
+    },
+    */
+     
     (cb) => {
-      /**
-      Bookmaker
-      **/
       const options = {
         method: 'GET',
-        url: 'https://v3.football.api-sports.io/odds',
+        url: 'https://v3.football.api-sports.io/odds/bookmakers',
         params: {
           //id: 688920,
-          //bookmaker: 3
-          league: 71, 
-          season: 2021,
-          date: '2021-06-06',
+          //bookmaker: 3,
+          //league: 71, 
+          //season: 2021,
+          //date: '2021-06-06',
         },
         headers: {
           'x-rapidapi-host': 'v3.football.api-sports.io',

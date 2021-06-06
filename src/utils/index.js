@@ -182,11 +182,20 @@ class Utils {
     .catch(() => {})
   }
   
+  getAllFixtures(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!") 
+	  knex('FIXTURE')
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
   getAllFixtureNotStartedYet(cb) {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
      
 	  knex('FIXTURE')
-    .where('status', 'not_started')
+    .where('status', 'NS')
 	  .then((_) => {
 	    return cb(null, _)
 	  })
@@ -197,9 +206,24 @@ class Utils {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
      
 	  knex('FIXTURE')
-    .where('status', 'pending')
+    .whereNot('status', 'NS')
 	  .then((_) => {
 	    return cb(null, _)
+	  })
+    .catch(() => {})
+  }
+  
+  updateFixtureStatus(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+    mod_assert.ok(typeof opts.status === 'string' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+        
+    knex('fixture')
+      .where({fixture_id: opts.fixture_id})
+      .update('status', opts.status)
+	  .then((_) => {
+	    return cb(null)
 	  })
     .catch(() => {})
   }
@@ -348,7 +372,7 @@ class Utils {
       timezone: opts.fixture.timezone,
       home_team: opts.teams.home.id,
       away_team: opts.teams.away.id,
-      status: 'not_started'
+      status: opts.fixture.status.short
     }
   }
   
@@ -411,39 +435,40 @@ class Utils {
     }) 
   }
   
-  //TODO: yet to be adjusted, when API providing data
   prepHomework(teams, cb) {
     mod_assert.ok(Array.isArray(teams), "arguments 'teams' must be an object")
     mod_assert.ok(teams.length === 2, "arguments 'teams' must contain two items")
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
     
     const fixture_id = teams[0].fixture_id
-    
+        
     footballAPi.getOddsByFixtureId({
       fixture_id: fixture_id
-    }, (err, odds) => {
+    }, (err, raw_odds) => {
       if (err) return cb(err)
       const [home_team, away_team] =  teams        
       const homework = {
         fixture_id: home_team.fixture_id,
-        bookmaker_id: config.get('bookmaker.id'),
         diff_market_cap: (home_team.total_market_value > away_team.total_market_value) ? getPctTeamMarketDiff(home_team.total_market_value, away_team.total_market_value) : getPctTeamMarketDiff(away_team.total_market_value, home_team.total_market_value),
         updated_at: knex.fn.now()
-      }
-      const [home_odds, away_odds] = odds      
-      if (home_odds && away_odds) {
+      }      
+      const [odds, referal_bookie_id] = raw_odds
+      const [home_odds, away_odds] = odds
+      if (odds) {
+        homework.bookmaker_id = referal_bookie_id
         homework.home_odds = home_odds
         homework.away_odds = away_odds
-        homework.favorite = home_odds
-        homework.underdog = away_odds
-        if (home_odds > away_odds) [home_odds, away_odds] = [away_odds, home_odds]
+        homework.favorite = (home_odds < away_odds) ? home_team.team_id : away_team.team_id
+        homework.underdog = (home_odds > away_odds) ? home_team.team_id : away_team.team_id
+        homework.favorite_market_cap = (home_odds < away_odds) ? home_team.total_market_value : away_team.total_market_value
+        homework.underdog_market_cap = (home_odds > away_odds) ? home_team.total_market_value : away_team.total_market_value
       }
       if (home_team.bnews && home_team.bnews.length > 0) {
         homework.home_bnews = home_team.bnews
       }
       if (away_team.bnews && away_team.bnews.length > 0) {
         homework.away_bnews = away_team.bnews
-      }
+      }      
       return cb(null, homework)
     })
   }

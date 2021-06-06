@@ -6,11 +6,16 @@
   "author": "Rode",
   "license": "MIT",
   "bin": {
-    "eft": "./bin/index.js --use-strict --expose-inspector-scripts"
+    "eft": "./bin/eft"
   },
   "scripts": {
     "dev": "NODE_ENV=dev && ./node_modules/.bin/nodemon --trace-warnings sample.js | ./node_modules/.bin/pino-pretty -c -l"
   },
+  "keywords": [
+    "cli",
+    "football",
+    "trading"
+  ],
   "dependencies": {
     "async": "^3.2.0",
     "auto-bind": "^4.0.0",

@@ -17,6 +17,7 @@ const mod_process = require('process')
 
 const Utils = require('../utils')
 const knex = require('../knex.js')
+const footballAPi = require('../services/footballAPi.js')
 
 /**
  * Module export
@@ -27,7 +28,24 @@ const knex = require('../knex.js')
 module.exports = () => {
   let spinner
   mod_async.waterfall([
-    Utils.getAllFixtureNotStartedYet, // TODO: create a routine to set status to end, 2h after the date of the match. not_started, pending, finished
+    Utils.getAllFixtureNotStartedYet,
+    (_, done) => {
+      mod_async.filter(_, (fixture, callback) => {
+        footballAPi.getFixtureById(fixture, (err, data) => {
+          if (err) 
+            return callback(err)
+          if (data.fixture.status.short === 'NS')
+            return callback(null, true)
+            
+          Utils.updateFixtureStatus({
+            fixture_id: data.fixture.id,
+            status: data.fixture.status.short
+          }, (err) => {
+            if (err) return callback(null, false)
+          })
+        })
+      } , done)
+    },
     (fixturesNotStartedYet, done) => {
       if (fixturesNotStartedYet.length === 0) return done(new Error('no fixtures have been found, please go fetch them first.'))
       spinner = mod_ora().start(`Doing homeworks, on fixtures available: [${fixturesNotStartedYet.length}] found.`)

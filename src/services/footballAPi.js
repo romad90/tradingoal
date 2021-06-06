@@ -15,8 +15,9 @@ const config = require('config')
  * @private
  */
 const patch = config.get('patch')
-const reference_bookmaker_id = config.get('bookmaker').id
+const referal_bookies = config.get('bookies')
 const logger = require('../logger')
+const knex = require('../knex')
 const headers = {
   'x-rapidapi-host': config.get('rapidapi-host'),
   'x-rapidapi-key': config.get('rapidapi-key')
@@ -115,6 +116,7 @@ const getFixtureByDate = (opts, cb) => {
 }
 
 const getOddsByFixtureId = (opts, cb) => {
+	mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
   mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
   mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number") 
   
@@ -123,20 +125,32 @@ const getOddsByFixtureId = (opts, cb) => {
 		  method: 'GET',
 		  url: `https://${config.get('rapidapi-host')}/odds`,
 		  params: {
-        fixture: opts.fixture_id,
-        bookmaker: reference_bookmaker_id
+        fixture: opts.fixture_id
 		},
 		headers
 	})
 	.then(_ => {
-    const bookmakers = _.data.response.bookmakers || []
-    if (bookmakers.length === 0) return cb(null, [0, 0])
-		return cb(null, bookmakers)
+    const bookies_available = _.data.response.pop().bookmakers || {}
+    let referal_bookie
+    loop1: for (let i = 0; i < referal_bookies.length; i++) { 
+      for (let j = 0; j < bookies_available.length; j++) {
+        if (referal_bookies[i].id === bookies_available[j].id) {
+          referal_bookie = bookies_available[j]
+          break loop1
+        }
+      }
+    }
+    const match_winner_market = referal_bookie.bets.filter((_) => _.name === 'Match Winner' ).pop()
+    const [home, draw, away] = match_winner_market.values
+    
+    
+    return cb(null, [[home.odd, away.odd], referal_bookie.id])
 	})
 	.catch(() => {})
 }
 
 const getInjuriesByTeam = (opts, cb) => {
+	mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
   mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
   mod_assert.ok(typeof opts.league_id === 'number' && opts !== null, "arguments 'opts.league_id' must be a number")
   mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
@@ -159,8 +173,9 @@ const getInjuriesByTeam = (opts, cb) => {
 	.catch(() => {})
 }
 
-const getLiveFixtures = (fixtureIds, cb) => {
-  mod_assert.ok(typeof fixtureIds === 'string' && opts !== null, "arguments 'fixtureIds' must be a string")
+const getLiveFixtures = (fixtureIds, cb) => {  
+	mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+  mod_assert.ok(typeof fixtureIds === 'string' && fixtureIds !== null, "arguments 'fixtureIds' must be a string")
     
   mod_axios
   .request({
@@ -174,6 +189,23 @@ const getLiveFixtures = (fixtureIds, cb) => {
   .catch(() => {})
 } 
 
+const getFixtureById = (opts, cb) => {
+  
+	mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+  mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+  mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+  
+  mod_axios
+  .request({
+	  method: 'GET',
+	  url: `https://${config.get('rapidapi-host')}/fixtures?id=${opts.fixture_id}`,
+    headers
+  })
+  .then(_ => {
+	  return cb(null, _.data.response.pop())
+  })
+  .catch(() => {})
+}
 /**
  * Module exports
  * @public
@@ -184,5 +216,6 @@ module.exports = {
 	getFixtureByDate,
   getOddsByFixtureId,
   getInjuriesByTeam,
-  getLiveFixtures
+  getLiveFixtures,
+  getFixtureById
 }
