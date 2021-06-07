@@ -106,10 +106,12 @@ module.exports = () => {
           (_, done) => {
 			      knex('FIXTURE')
 				      .insert(_)
+              .onConflict('email')
+              .merge('fixture_id', 'home_team', 'away_team')
 				    .then(res => {
 				      return done(null)
 				    })
-				    .catch(cb)	
+				    .catch(done)	
           }
         ], (err) => {
           if (err) {
