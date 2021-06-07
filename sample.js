@@ -57,23 +57,25 @@ mod_async.series([
 					return cb(null, teams)
 			})
     })
-	},
+	},*/
+  
+  //america-futebol-clube-mg-/startseite/verein/2863/saison_id/2020
+  //https://www.transfermarkt.com/cuiaba-ec-mt-/startseite/verein/28022/saison_id/2020
   mod_async.apply(WScrapper.parsePlayer, {
       league_id: 71,
       country: 'Brazil',
-      team_id: 121,
-      name: 'Sociedade Esportiva Palmeiras',
-      short_name: 'Palmeiras',
-      total_market_value: 145.05,
+      team_id: 125,
+      name: 'América Futebol Clube (MG)',
+      short_name: 'America Mineiro',
+      total_market_value: 12.9,
       total_market_value_unit: 'm',
       total_market_value_currency: '€',
-      average_market_value: 3.92,
-      average_market_value_unit: 'm',
+      average_market_value: 331,
+      average_market_value_unit: 'th',
       average_market_value_currency: '€',
-      url_logo: 'https://tmssl.akamaized.net/images/wappen/tiny/1023.png?lm=1411204983',
-      url_players: '/se-palmeiras-sao-paulo/startseite/verein/1023/saison_id/2020'
+      url_logo: 'https://tmssl.akamaized.net/images/wappen/tiny/2863.png?lm=1419949367',
+      url_players: '/cuiaba-ec-mt-/startseite/verein/28022/saison_id/2020'
     }),
-		*/
 		/*
 		(cb) => {
 			footballAPi.getFixtureByDate({
@@ -265,7 +267,8 @@ mod_async.series([
         method: 'GET',
         url: 'https://v3.football.api-sports.io/injuries',
         params: {
-          fixture: 688919,
+          fixture: 688927,
+          team:134
           //bookmaker: 3
           //league: 188, 
           //season: 2021,
@@ -287,9 +290,9 @@ mod_async.series([
       	return cb(null)
     	})
   		.catch(() => {})
-    },
-    */
-     
+    },*
+
+    /*
     (cb) => {
       const options = {
         method: 'GET',
@@ -317,7 +320,39 @@ mod_async.series([
       	return cb(null)
     	})
   		.catch(() => {})
-    }
+    }*/
+    /*
+    (cb) => {
+
+       const options = {
+         method: 'GET',
+         url: 'https://v3.football.api-sports.io/teams',
+         params: {
+           //fixture: 688927,
+           //team:134
+           //bookmaker: 3
+           league: 128, 
+           season: 2021,
+           //date: '2021-06-03',
+         },
+         headers: {
+           'x-rapidapi-host': 'v3.football.api-sports.io',
+           'x-rapidapi-key': 'a9f6d46c4598107951d83d8aeb3f7d36'
+         }
+       }
+	  
+       mod_axios
+   		.request(options)
+     	.then(response => {
+         console.log(response)
+       	response.data.response.forEach((_) => {
+       	  console.log(_)
+       	})
+       	return cb(null)
+     	})
+   		.catch(() => {})
+     },*/
 ], (err, results) => {
     if (err) throw err
+      console.log(results)
 })

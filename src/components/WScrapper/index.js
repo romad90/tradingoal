@@ -168,7 +168,7 @@ class WScrapper {
         })
         return cb(null, data.filter(funnelingData))
       })
-      .catch(() => {})
+      .catch(cb)
 	}
   
   parseTeam(opts, cb) {
@@ -262,7 +262,7 @@ class WScrapper {
         })
         return cb(null, data)
       })
-      .catch(() => {})
+      .catch(cb)
   }
 
   parsePlayer(opts, cb) {
@@ -276,16 +276,18 @@ class WScrapper {
       mod_assert.ok(_.numbers && _.numbers !== null, "argument 'opts.numbers' cannot be null")
       mod_assert.ok(_.irrelevant && _.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
       mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null") 
-      mod_assert.ok(_.irrelevant1 && _.irrelevant1 !== null, "argument 'opts.irrelevant1' cannot be null")
+      mod_assert.ok(_.birth_date && _.birth_date !== null, "argument 'opts.birth_date' cannot be null")
 			
 			if (_.market_value === null) {
 				_.market_value = '€0.0m'
 			}
+      
       const {value:market_value, unit:market_value_unit, currency:market_value_currency} = rValueAsExpected({value:_.market_value}) 
-
+      
       return {
 				team_id: opts.team_id,
         name: _.name.trim(),
+        birth_date: _.birth_date.trim() === '- (-)' ? 'nc.' : _.birth_date.trim(),
         market_value,
         market_value_unit,
         market_value_currency,
@@ -305,7 +307,7 @@ class WScrapper {
           'numbers',
           'irrelevant',
           'name',
-          'irrelevant1',
+          'birth_date',
           'market_value',
         ]
 
@@ -327,7 +329,7 @@ class WScrapper {
         })
         return cb(null, data)
       })
-      .catch(() => {})
+      .catch(cb)
   }
 }
 

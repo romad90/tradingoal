@@ -115,10 +115,12 @@ class Utils {
 			const leagues = raw.flat()
 			knex('LEAGUE')
 				.insert(leagues)
+        .onConflict('league_id', 'league_name')
+        .merge()
 				.then(() => {
 					return cb(null, leagues)
 				})
-      .catch(() => {})	
+      .catch(cb)	
 		})
   }
 	
@@ -139,10 +141,12 @@ class Utils {
 				if (err) return cb(err)
 				knex('TEAM')
 					.insert(teams)
+          .onConflict('team_id', 'short_name')
+          .merge()
 					.then(() => {
 						return cb(null, teams)
 					})
-        .catch(() => {})	
+        .catch(cb)	
 			})
     })
 	}
@@ -158,10 +162,12 @@ class Utils {
 			  if (err) return cb(err)
 			  knex('PLAYER')
 				  .insert(players)
+          .onConflict('team_id', 'short_name')
+          .merge()
 				  .then(() => {
 					  return cb(null, players)
 				})
-        .catch(() => {})
+        .catch(cb)
 			})
 		}, randomIntFromInterval(MIN, MAX))  
   }
@@ -179,7 +185,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getAllFixtures(cb) {
@@ -188,7 +194,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getAllFixtureNotStartedYet(cb) {
@@ -199,7 +205,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getAllFixtureInPending(cb) {
@@ -210,7 +216,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   updateFixtureStatus(opts, cb) {
@@ -225,7 +231,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   updateFixtureToInPending(opts, cb) {
@@ -241,7 +247,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   updateFixtureToFinished(opts, cb) {
@@ -257,7 +263,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getFixtureById(opts, cb) {
@@ -270,7 +276,7 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getLeagueAvailable(cb) {
@@ -281,7 +287,7 @@ class Utils {
 	  .then((leagues) => {
 	    return cb(null, leagues)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getTeamNumberByLeagueId(opts, cb) {
@@ -295,7 +301,7 @@ class Utils {
 	  .then((teams) => {
 		  return cb(null, teams.length)
     })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getTeamById(opts, cb) {
@@ -308,7 +314,7 @@ class Utils {
 	  .then((_) => {
 		  return cb(null, _.pop())
     })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getPlayerNumberByLeagueId(opts, cb) {
@@ -322,7 +328,7 @@ class Utils {
 	  .then((players) => {
 		  return cb(null, players.length)
     })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getThresholdByLeagueId(opts, cb) {
@@ -424,6 +430,7 @@ class Utils {
       (_, done) => {
         footballAPi.getInjuriesByTeam(_, (err, data) => {
           if (err) return done(err)
+          console.log(data)
           _.bnews = data
           return done(null, _)
         })
@@ -481,7 +488,7 @@ class Utils {
     .then(_ => {
       return cb(null) 
     })
-    .catch(() => {})
+    .catch(cb)
   }
   
   getAllStrategy(cb) {
@@ -492,7 +499,7 @@ class Utils {
 	  .then((strategy) => {
 	    return cb(null, strategy)
 	  })
-    .catch(() => {})
+    .catch(cb)
   }
 }
 

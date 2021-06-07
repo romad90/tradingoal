@@ -79,8 +79,7 @@ module.exports = () => {
       const leagues_ids = []
   
       if (!regex.test(date)) {
-        console.log(date)
-		    console.log('date must be a string as YYYY-mm-dd')
+		    console.log(`date must be a string as YYYY-mm-dd :: ${date}`)
 		    mod_process.exit(0)
       }
   
@@ -110,7 +109,7 @@ module.exports = () => {
 				    .then(res => {
 				      return done(null)
 				    })
-				    .catch(() => {})	
+				    .catch(cb)	
           }
         ], (err) => {
           if (err) {

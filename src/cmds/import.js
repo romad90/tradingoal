@@ -40,7 +40,6 @@ module.exports = () => {
       const country = answers.country.toLowerCase()
       const spinner = mod_ora().start('Importation in progress...')
       
-      throw new Error('A')
     	mod_async.waterfall([
     		(done) => {
     			Utils.isMySQLUp((err) => {

@@ -18,7 +18,7 @@ const Utils = require('../utils')
  * @public
  */
 module.exports = () => {
-	console.log(`PUBLISH`)
+	console.log(`OPPORTUNITY`)
   // FETCH ALL HOMEWORK OF FIXTURES NOT STARTED
   // CREATE JOURNAL TRADING PER LEAGUE, SEASON, DATE_FIXURE
 }

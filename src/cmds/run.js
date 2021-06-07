@@ -30,16 +30,17 @@ module.exports = () => {
   mod_async.waterfall([
     Utils.getAllFixtureNotStartedYet,
     (_, done) => {
-      mod_async.filter(_, (fixture, callback) => {
+      mod_async.filter(_, (fixture, callback) => {        
         footballAPi.getFixtureById(fixture, (err, data) => {
           if (err) 
             return callback(err)
+            
           if (data.fixture.status.short === 'NS')
             return callback(null, true)
             
           Utils.updateFixtureStatus({
             fixture_id: data.fixture.id,
-            status: data.fixture.status.short
+            status: 'LOCKED'
           }, (err) => {
             if (err) return callback(null, false)
           })
@@ -47,8 +48,8 @@ module.exports = () => {
       } , done)
     },
     (fixturesNotStartedYet, done) => {
-      if (fixturesNotStartedYet.length === 0) return done(new Error('no fixtures have been found, please go fetch them first.'))
       spinner = mod_ora().start(`Doing homeworks, on fixtures available: [${fixturesNotStartedYet.length}] found.`)
+      if (fixturesNotStartedYet.length === 0) return done(new Error('no fixtures have been found, please go fetch them first.'))
       mod_async.map(fixturesNotStartedYet, (_, callback) => {
         mod_async.parallel([
           mod_async.apply(Utils.preHomeworkPerTeam, {
@@ -69,7 +70,10 @@ module.exports = () => {
     },
     Utils.addHomework
   ], (err) => {
-    if (err) throw (err)
+    if (err) {
+      spinner.warn(err.message)
+      mod_process.exit(0)
+    }
     spinner.succeed()
     mod_process.exit(1)
   })

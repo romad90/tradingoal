@@ -18,10 +18,31 @@
         "name_league" : "Campeonato Brasileiro Serie A",
         "number_teams_expected": 20,
         "number_players_expected": 738
+      },
+      "128": {
+        "name_league": "Copa de la Liga Profesional de Futbol",
+        "number_teams_expected": 26,
+        "number_players_expected": 755
       }
   },
   "patch": {
     "team_name" : {
+      "argentina": {
+        "Gimnasia": "Gimnasia L.P.",
+        "CA Banfield": "Banfield",
+        "CA Patronato": "Patronato",
+        "CA Rosario": "Rosario Central",
+        "CA Tucumán": "Atletico Tucuman",
+        "Estudiantes": "Estudiantes L.P.",
+        "Argentinos Jrs.": "Argentinos JRS",
+        "Defensa": "Defensa Y Justicia",
+        "CA Sarmiento": "Sarmiento Junin",
+        "CA Unión": "Union Santa Fe",
+        "Arsenal FC": "Arsenal Sarandi",
+        "CA Talleres": "Talleres Cordoba",
+        "CA Colón": "Colon Santa Fe",
+        "Newell's": "Newells Old Boys"
+      },
       "brazil": {
         "Athletico-PR": "Atletico Paranaense",
         "Chapecoense": "Chapecoense-sc",

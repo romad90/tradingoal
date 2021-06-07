@@ -33,9 +33,9 @@ const setTeamId = (opts, cb) => {
   mod_assert.ok(typeof opts.short_name === 'string' && opts !== null, "argument 'opts.short_name' must be an string")
   mod_assert.ok(typeof opts.country === 'string' && opts !== null, "argument 'opts.country' must be an string")
 	
-  //Necessary, cause data may differs between two differenys datasets.
-  opts.short_name = patch['team_name'][opts.country.toLowerCase()][opts.short_name] || opts.short_name
-  const patch_name = patch['team_name'][opts.country.toLowerCase()][opts.short_name]
+  //Necessary, cause data may differs between two differenys datasets.  
+  opts.short_name = patch?.['team_name']?.[opts?.country.toLowerCase()]?.[opts.short_name] || opts.short_name
+  const patch_name = patch?.['team_name']?.[opts?.country.toLowerCase()]?.[opts.short_name]
   
   mod_axios
     .request({
@@ -58,9 +58,7 @@ const setTeamId = (opts, cb) => {
 			opts.team_id = _.team.id
       return cb(null, opts)
     })
-  .catch(err => {
-    return cb(err)
-  })
+  .catch(cb)
 }
 
 /**
@@ -87,7 +85,7 @@ const searchTeamByName = (opts, cb) => {
 			}) 
     	return cb(null, res)
   	})
-		.catch(() => {})
+		.catch(cb)
 }
 
 
@@ -112,7 +110,7 @@ const getFixtureByDate = (opts, cb) => {
 		.then(_ => {
   		return cb(null, _.data.response)
 		})
-		.catch(() => {})
+		.catch(cb)
 }
 
 const getOddsByFixtureId = (opts, cb) => {
@@ -146,7 +144,7 @@ const getOddsByFixtureId = (opts, cb) => {
     
     return cb(null, [[home.odd, away.odd], referal_bookie.id])
 	})
-	.catch(() => {})
+	.catch(cb)
 }
 
 const getInjuriesByTeam = (opts, cb) => {
@@ -170,7 +168,7 @@ const getInjuriesByTeam = (opts, cb) => {
 	.then(_ => {
 		return cb(null, _.data.response)
 	})
-	.catch(() => {})
+	.catch(cb)
 }
 
 const getLiveFixtures = (fixtureIds, cb) => {  
@@ -186,15 +184,14 @@ const getLiveFixtures = (fixtureIds, cb) => {
   .then(_ => {
 	  return cb(null, _.data.response)
   })
-  .catch(() => {})
+  .catch(cb)
 } 
 
 const getFixtureById = (opts, cb) => {
-  
-	mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+  mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
   mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
   mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
-  
+    
   mod_axios
   .request({
 	  method: 'GET',
@@ -204,7 +201,7 @@ const getFixtureById = (opts, cb) => {
   .then(_ => {
 	  return cb(null, _.data.response.pop())
   })
-  .catch(() => {})
+  .catch(cb)
 }
 /**
  * Module exports
