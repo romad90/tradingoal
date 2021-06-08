@@ -13,8 +13,8 @@ const mod_assert = require('assert').strict
  * Module variables
  * @private
  */
-const Utils = require('../utils')
-const knex = require('knex')
+const Utils = require('../../utils')
+const knex = require('../../knex')
 const DIFFERENCE = 15
 
 const isMarketCapsAlike = (greater, lower)  => {
@@ -81,18 +81,20 @@ class DealSeeker {
     mod_assert.ok(typeof homework === 'object' && homework !== null, "argument 'opts' cannot be null")
     mod_assert.ok(typeof homework.fixture_id === 'number' && homework.fixture_id !== null, "argument 'opts.number' cannot be null")
     mod_assert.ok(typeof homework.bookmaker_id === 'number' && homework.bookmaker_id !== null, "argument 'opts.bookmaker_id' cannot be null")
-    mod_assert.ok(typeof homework.home_odds === 'number' && homework.home_odds !== null, "argument 'opts.home_odds' cannot be null")
-    mod_assert.ok(typeof homework.away_odds === 'string' && homework.away_odds !== null, "argument 'opts.away_odds' cannot be null")
-    mod_assert.ok(typeof homework.diff_market_cap === 'string' && homework.diff_market_cap !== null, "argument 'opts.diff_market_cap' cannot be null")
-    mod_assert.ok(typeof homework.favorite === 'string' && homework.favorite !== null, "argument 'opts.favorite' cannot be null")
-    mod_assert.ok(typeof homework.favorite_market_cap === 'string' && homework.favorite_market_cap !== null, "argument 'opts.favorite_market_cap' cannot be null")
-    mod_assert.ok(typeof homework.underdog === 'string' && homework.underdog !== null, "argument 'opts.underdog' cannot be null")
-    mod_assert.ok(typeof homework.underdog_market_cap === 'string' && homework.underdog_market_cap !== null, "argument 'opts.underdog_market_cap' cannot be null")
+    mod_assert.ok(homework.home_odds, "argument 'opts.home_odds' cannot be null")
+    mod_assert.ok(typeof homework.home_odds === 'number', "argument 'opts.home_odds' must be a number")
+    mod_assert.ok(homework.away_odds, "argument 'opts.away_odds' cannot be null")
+    mod_assert.ok(typeof homework.away_odds === 'number', "argument 'opts.away_odds' cannot be null")
+    mod_assert.ok(typeof homework.diff_market_cap === 'number', "argument 'opts.diff_market_cap' must be a number")
+    mod_assert.ok(typeof homework.favorite === 'number', "argument 'opts.favorite' must be a number")
+    mod_assert.ok(typeof homework.favorite_market_cap === 'number', "argument 'opts.favorite_market_cap' must be a number")
+    mod_assert.ok(typeof homework.underdog === 'number', "argument 'opts.underdog' must be a number")
+    mod_assert.ok(typeof homework.underdog_market_cap === 'number', "argument 'opts.underdog_market_cap' must be a number")
     
     //Wrong Princing
     if (!homework.favorite_market_cap > homework.underdog_market_cap) {
       return cb(null, {
-        fixture_id: homework.fixture_id
+        fixture_id: homework.fixture_id,
         strategy_id: 8
       })
     }
@@ -101,22 +103,22 @@ class DealSeeker {
       if (isUnderdogPlayingAway(homework)) {
         return cb(null, [
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 2,
           },
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 4,
           }
         ])
       } else {
         return cb(null, [
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 1,
           },
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 3,
           }
         ])
@@ -127,18 +129,18 @@ class DealSeeker {
       if (isUnderdogPlayingAway(homework)) {
         return cb(null, [
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 5,
           },
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 7,
           }
         ])
       } else {
         return cb(null, [
           {
-            fixture_id: homework.fixture_id
+            fixture_id: homework.fixture_id,
             strategy_id: 6,
           },
         ])
@@ -147,7 +149,7 @@ class DealSeeker {
     
     //Nothing todo ...
     return cb (null, {
-      fixture_id: homework.fixture_id
+      fixture_id: homework.fixture_id,
       strategy_id: 9
     })
   }

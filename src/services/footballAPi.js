@@ -134,6 +134,10 @@ const getOddsByFixtureId = (opts, cb) => {
 		headers
 	})
 	.then(_ => {
+    const { response } =  _.data
+    
+    if (response.length === 0) return cb(null, [[0,0], 0])
+      
     const bookies_available = _.data.response.pop().bookmakers || {}
     let referal_bookie
     loop1: for (let i = 0; i < referal_bookies.length; i++) { 
@@ -144,9 +148,11 @@ const getOddsByFixtureId = (opts, cb) => {
         }
       }
     }
+    
+    if (!referal_bookie) return cb(null, [[0,0], 0])
+      
     const match_winner_market = referal_bookie.bets.filter((_) => _.name === 'Match Winner' ).pop()
     const [home, draw, away] = match_winner_market.values
-    
     
     return cb(null, [[home.odd, away.odd], referal_bookie.id])
 	})

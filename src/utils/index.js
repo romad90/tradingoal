@@ -143,7 +143,7 @@ class Utils {
 				if (err) return cb(err)
 				knex('TEAM')
 					.insert(teams)
-          .onConflict('team_id', 'short_name')
+          .onConflict('team_id', 'short_name', 'league_id')
           .merge()
 					.then(() => {
 						return cb(null, teams)
@@ -166,7 +166,7 @@ class Utils {
 			  if (err) return cb(err)
 			  knex('PLAYER')
 				  .insert(players)
-          .onConflict('team_id', 'short_name')
+          .onConflict('team_id', 'short_name', 'birth_date')
           .merge()
 				  .then(() => {
 					  return cb(null, players)
@@ -494,10 +494,19 @@ class Utils {
         homework.bookmaker_id = referal_bookie_id
         homework.home_odds = home_odds
         homework.away_odds = away_odds
-        homework.favorite = (home_odds < away_odds) ? home_team.team_id : away_team.team_id
-        homework.underdog = (home_odds > away_odds) ? home_team.team_id : away_team.team_id
-        homework.favorite_market_cap = (home_odds < away_odds) ? home_team.total_market_value : away_team.total_market_value
-        homework.underdog_market_cap = (home_odds > away_odds) ? home_team.total_market_value : away_team.total_market_value
+        
+        if ( home_odds === 0 && away_odds === 0) {
+          homework.favorite = (home_team.total_market_value > away_team.total_market_value) ? home_team.team_id : away_team.team_id
+          homework.favorite_market_cap = (home_team.total_market_value > away_team.total_market_value) ? home_team.total_market_value : away_team.total_market_value
+          homework.underdog = (home_team.total_market_value < away_team.total_market_value) ? home_team.team_id : away_team.team_id
+          homework.underdog_market_cap = (home_team.total_market_value < away_team.total_market_value) ? home_team.total_market_value : away_team.total_market_value
+          
+        } else {
+          homework.favorite = (home_odds < away_odds) ? home_team.team_id : away_team.team_id
+          homework.favorite_market_cap = (home_odds < away_odds) ? home_team.total_market_value : away_team.total_market_value
+          homework.underdog = (home_odds > away_odds) ? home_team.team_id : away_team.team_id
+          homework.underdog_market_cap = (away_odds > away_odds) ? away_team.total_market_value : home_team.total_market_value
+        }
       }
       if (home_team.bnews && home_team.bnews.length > 0) {
         homework.home_bnews = home_team.bnews
@@ -529,6 +538,21 @@ class Utils {
     .select('*')
 	  .then((strategy) => {
 	    return cb(null, strategy)
+	  })
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
+  }
+  
+  getHomeworksNotStartedYet(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+    knex('HOMEWORK')
+    .join('FIXTURE', 'HOMEWORK.fixture_id', 'FIXTURE.fixture_id')
+    .where('FIXTURE.status', '=', 'NS' )
+    .andWhere('HOMEWORK.home_odds', '>', 0)
+    .andWhere('HOMEWORK.away_odds', '>', 0)
+	  .then((homeworks) => {
+	    return cb(null, homeworks)
 	  })
     .catch((error) => {
       mod_assert.fail(error,'Promise error')

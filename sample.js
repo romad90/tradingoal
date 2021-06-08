@@ -61,6 +61,7 @@ mod_async.series([
   
   //america-futebol-clube-mg-/startseite/verein/2863/saison_id/2020
   //https://www.transfermarkt.com/cuiaba-ec-mt-/startseite/verein/28022/saison_id/2020
+  /*
   mod_async.apply(WScrapper.parsePlayer, {
       league_id: 71,
       country: 'Brazil',
@@ -76,7 +77,8 @@ mod_async.series([
       url_logo: 'https://tmssl.akamaized.net/images/wappen/tiny/2863.png?lm=1419949367',
       url_players: '/cuiaba-ec-mt-/startseite/verein/28022/saison_id/2020'
     }),
-		/*
+  */
+  /*
 		(cb) => {
 			footballAPi.getFixtureByDate({
 				league: 71,
@@ -100,7 +102,8 @@ mod_async.series([
 				  	.catch(console.error)	
 				})
 			})
-		},*/
+		},
+    */
 		/*
 		(cb) => {
 			const reliabilities = [
@@ -243,10 +246,10 @@ mod_async.series([
   	})
 		.catch(() => {})
   },
-  /*
+    */
 	(cb) => {
 		footballAPi.getFixtureByDate({
-			league: 71,
+			league: 128,
 			date: '2021-06-06'
 		}, (err, fixtures) => {
 			if (err) return cb(err)
@@ -259,7 +262,7 @@ mod_async.series([
 				cb(null)
 			})
 		})
-	}*/
+	}
     /*
    (cb) => {
 
