@@ -120,7 +120,9 @@ class Utils {
 				.then(() => {
 					return cb(null, leagues)
 				})
-      .catch(cb)	
+      .catch((error) => {
+        mod_assert.fail(error,'Promise error')
+      })	
 		})
   }
 	
@@ -146,7 +148,9 @@ class Utils {
 					.then(() => {
 						return cb(null, teams)
 					})
-        .catch(cb)	
+        .catch((error) => {
+          mod_assert.fail(error,'Promise error')
+        })	
 			})
     })
 	}
@@ -167,7 +171,9 @@ class Utils {
 				  .then(() => {
 					  return cb(null, players)
 				})
-        .catch(cb)
+        .catch((error) => {
+          mod_assert.fail(error,'Promise error')
+        })
 			})
 		}, randomIntFromInterval(MIN, MAX))  
   }
@@ -185,7 +191,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getAllFixtures(cb) {
@@ -194,7 +202,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getAllFixtureNotStartedYet(cb) {
@@ -205,7 +215,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getAllFixtureInPending(cb) {
@@ -216,7 +228,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   updateFixtureStatus(opts, cb) {
@@ -231,7 +245,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   updateFixtureToInPending(opts, cb) {
@@ -247,7 +263,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   updateFixtureToFinished(opts, cb) {
@@ -263,7 +281,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getFixtureById(opts, cb) {
@@ -276,7 +296,9 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getLeagueAvailable(cb) {
@@ -287,7 +309,9 @@ class Utils {
 	  .then((leagues) => {
 	    return cb(null, leagues)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getTeamNumberByLeagueId(opts, cb) {
@@ -301,7 +325,9 @@ class Utils {
 	  .then((teams) => {
 		  return cb(null, teams.length)
     })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getTeamById(opts, cb) {
@@ -314,7 +340,9 @@ class Utils {
 	  .then((_) => {
 		  return cb(null, _.pop())
     })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getPlayerNumberByLeagueId(opts, cb) {
@@ -328,7 +356,9 @@ class Utils {
 	  .then((players) => {
 		  return cb(null, players.length)
     })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getThresholdByLeagueId(opts, cb) {
@@ -430,7 +460,6 @@ class Utils {
       (_, done) => {
         footballAPi.getInjuriesByTeam(_, (err, data) => {
           if (err) return done(err)
-          console.log(data)
           _.bnews = data
           return done(null, _)
         })
@@ -488,7 +517,9 @@ class Utils {
     .then(_ => {
       return cb(null) 
     })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
   
   getAllStrategy(cb) {
@@ -499,7 +530,9 @@ class Utils {
 	  .then((strategy) => {
 	    return cb(null, strategy)
 	  })
-    .catch(cb)
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
   }
 }
 

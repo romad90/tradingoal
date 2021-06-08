@@ -58,7 +58,9 @@ const setTeamId = (opts, cb) => {
 			opts.team_id = _.team.id
       return cb(null, opts)
     })
-  .catch(cb)
+  .catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
 }
 
 /**
@@ -85,7 +87,9 @@ const searchTeamByName = (opts, cb) => {
 			}) 
     	return cb(null, res)
   	})
-		.catch(cb)
+		.catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
 }
 
 
@@ -110,7 +114,9 @@ const getFixtureByDate = (opts, cb) => {
 		.then(_ => {
   		return cb(null, _.data.response)
 		})
-		.catch(cb)
+		.catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
 }
 
 const getOddsByFixtureId = (opts, cb) => {
@@ -144,7 +150,9 @@ const getOddsByFixtureId = (opts, cb) => {
     
     return cb(null, [[home.odd, away.odd], referal_bookie.id])
 	})
-	.catch(cb)
+	.catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
 }
 
 const getInjuriesByTeam = (opts, cb) => {
@@ -168,7 +176,9 @@ const getInjuriesByTeam = (opts, cb) => {
 	.then(_ => {
 		return cb(null, _.data.response)
 	})
-	.catch(cb)
+	.catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
 }
 
 const getLiveFixtures = (fixtureIds, cb) => {  
@@ -184,7 +194,9 @@ const getLiveFixtures = (fixtureIds, cb) => {
   .then(_ => {
 	  return cb(null, _.data.response)
   })
-  .catch(cb)
+  .catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
 } 
 
 const getFixtureById = (opts, cb) => {
@@ -201,7 +213,9 @@ const getFixtureById = (opts, cb) => {
   .then(_ => {
 	  return cb(null, _.data.response.pop())
   })
-  .catch(cb)
+  .catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
 }
 /**
  * Module exports

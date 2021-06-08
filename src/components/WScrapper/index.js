@@ -168,7 +168,9 @@ class WScrapper {
         })
         return cb(null, data.filter(funnelingData))
       })
-      .catch(cb)
+      .catch((error) => {
+        mod_assert.isNotOk(error,'Promise error')
+      })
 	}
   
   parseTeam(opts, cb) {
@@ -262,7 +264,9 @@ class WScrapper {
         })
         return cb(null, data)
       })
-      .catch(cb)
+      .catch((error) => {
+        mod_assert.isNotOk(error,'Promise error')
+      })
   }
 
   parsePlayer(opts, cb) {
@@ -329,7 +333,9 @@ class WScrapper {
         })
         return cb(null, data)
       })
-      .catch(cb)
+      .catch((error) => {
+        mod_assert.isNotOk(error,'Promise error')
+      })
   }
 }
 

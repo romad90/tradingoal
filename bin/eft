@@ -1,3 +1,2 @@
-#!/usr/bin/env node --use-strict --trace-uncaught --trace-warnings
-
+#!/usr/bin/env node --use-strict --trace-warnings --unhandled-rejections=strict
 require('../src/cli')(process.argv)

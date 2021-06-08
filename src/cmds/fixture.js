@@ -5,6 +5,7 @@
  * @private
  */
 
+const mod_assert = require('assert').strict
 const mod_async = require('async')
 const mod_inquirer = require('inquirer')
 const mod_ora = require('ora')
@@ -18,6 +19,7 @@ const Utils = require('../utils')
 const knex = require('../knex.js')
 const footballAPi = require('../services/footballAPi.js')
 const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/
+let spinner
 
 /**
  * Module export
@@ -90,7 +92,7 @@ module.exports = () => {
       }
   
       mod_async.map(leagues_ids, (league_id, callback) => {
-        const spinner = mod_ora().start(`Fixtures on ${date}, leagues:${league_id}, season:${season} in searching...`)
+        spinner = mod_ora().start(`Fixtures on ${date}, leagues:${league_id}, season:${season} in searching...`)
     
         mod_async.waterfall([
           mod_async.apply(footballAPi.getFixtureByDate, {
@@ -104,6 +106,7 @@ module.exports = () => {
             }, done)
           },
           (_, done) => {
+            if (_.length === 0) return done(new Error('Fixtures array is empty for now, please change try another date'))
 			      knex('FIXTURE')
 				      .insert(_)
               .onConflict('email')
@@ -111,19 +114,23 @@ module.exports = () => {
 				    .then(res => {
 				      return done(null)
 				    })
-				    .catch(done)	
+				    .catch((error) => {
+              mod_assert.fail(error,'Promise error')
+            })	
           }
         ], (err) => {
           if (err) {
-            spinner.fail(`An error occured, fixtures on ${date}, league:${league_id}, season:${season}.`)
             return callback(err)
           }
           spinner.succeed(`Fixtures :: ${date} , league :: ${league_id}, season :: ${season} added!`)
           return callback(null)
         })
-      }, function(err) {
-        if(err) throw err
-        const spinner = mod_ora().succeed(`Finished!`)
+      }, (err) => {
+        if(err) {
+          spinner.fail(err.message)
+          mod_process.exit(0)
+        }
+        spinner.succeed(`Finished!`)
         mod_process.exit(1)
       })
     })
