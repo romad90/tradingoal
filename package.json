@@ -14,7 +14,8 @@
   "keywords": [
     "cli",
     "football",
-    "trading"
+    "trading",
+    "automation"
   ],
   "dependencies": {
     "async": "^3.2.0",
