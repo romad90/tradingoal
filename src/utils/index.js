@@ -137,7 +137,7 @@ class Utils {
 				
 			mod_async.map(teams, (_, done) => {
 				setTimeout(function(){
-					footballAPi.setTeamId(_, done)
+					footballAPi.setExtraTeamInfos(_, done)
 				}, randomIntFromInterval(MIN, MAX))
 			}, function(err, teams) {
 				if (err) return cb(err)
@@ -563,6 +563,63 @@ class Utils {
         mod_assert.fail(error,'Promise error')
       })
   }
-}
+  
+  getDatasetToPublish(cb){
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+    
+    knex
+      .select(
+        'LEA.league_name as lea_league_name',
+        'LEA.country as lea_country',
+        'LEA.url_flag_country as lea_url_flag_country',
+        'LEA.continent as lea_continent',
+        'LEA.url_logo as lea_url_logo',
+        'HK.fixture_id as hk_fixture_id',
+        'HK.bookmaker_id as hk_bookmaker_id',
+        'HK.home_odds as hk_home_odds',
+        'HK.home_bnews as hk_home_bnews',
+        'HK.away_odds as hk_away_odds',
+        'HK.away_bnews as hk_away_bnews',
+        'HK.diff_market_cap as hk_diff_market_cap',
+        'FAV.team_id as fav_team_id',
+        'FAV.short_name as fav_short_name',
+        'HK.favorite_market_cap as hk_favorite_market_cap',
+        'FAV.url_logo as fav_url_logo',
+        'UDG.team_id as udg_team_id',
+        'UDG.short_name as udg_short_name',
+        'HK.underdog_market_cap as hk_underdog_market_cap',
+        'UDG.url_logo as udg_url_logo'
+      )
+      .from('HOMEWORK as HK')
+      .join('FIXTURE as FIX', 'HK.fixture_id', 'FIX.fixture_id')
+      .join('LEAGUE as LEA', 'LEA.league_id', 'FIX.league_id')
+      .join('TEAM as FAV', 'HK.favorite', 'FAV.team_id')
+      .join('TEAM as UDG', 'HK.underdog', 'UDG.team_id')      
+      .where('FIX.status', '=', 'NS' )
+      .andWhere('HK.home_odds', '>', 0)
+      .andWhere('HK.away_odds', '>', 0)
+      .then((homeworks) => {
+        return cb(null, homeworks)
+      })
+      .catch((error) => {
+        mod_assert.fail(error,'Promise error')
+    })
+  }
+  
+  getOpportunity(opts, cb) {
+    console.log(opts)
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+    mod_assert.ok(typeof opts.hk_fixture_id === 'number' && opts.hk_fixture_id !== null, "arguments 'opts.hk_fixture_id' must be a number") 
+    
+	  knex('OPPORTUNITY')
+    .where('fixture_id', opts.hk_fixture_id)
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })  
+  }
+ }
 
 module.exports = new Utils()

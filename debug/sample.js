@@ -297,7 +297,7 @@ mod_async.series([
     	})
   		.catch(() => {})
     },*/
-
+    /*
     (cb) => {
       const options = {
         method: 'GET',
@@ -326,7 +326,8 @@ mod_async.series([
     	})
   		.catch(() => {})
     },
-    /*
+    */
+    
     (cb) => {
 
        const options = {
@@ -356,7 +357,7 @@ mod_async.series([
        	return cb(null)
      	})
    		.catch(() => {})
-     },*/
+     }
 ], (err, results) => {
     if (err) throw err
       console.log(results)

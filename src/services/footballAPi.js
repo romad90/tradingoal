@@ -27,7 +27,7 @@ const headers = {
  * Main
  */
 
-const setTeamId = (opts, cb) => {
+const setExtraTeamInfos = (opts, cb) => {
   mod_assert.ok(typeof cb === 'function')
   mod_assert.ok(typeof opts === 'object' && opts !== null, "opts' must be an string")  
   mod_assert.ok(typeof opts.short_name === 'string' && opts !== null, "argument 'opts.short_name' must be an string")
@@ -56,6 +56,7 @@ const setTeamId = (opts, cb) => {
       }
       const _ = res.pop()
 			opts.team_id = _.team.id
+      opts.url_logo = _.team.logo
       return cb(null, opts)
     })
   .catch((error) => {
@@ -228,7 +229,7 @@ const getFixtureById = (opts, cb) => {
  * @public
  */
 module.exports = {
-  setTeamId,
+  setExtraTeamInfos,
 	searchTeamByName,
 	getFixtureByDate,
   getOddsByFixtureId,
