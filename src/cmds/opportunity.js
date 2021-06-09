@@ -22,9 +22,7 @@ const DealSeeker = require('../components/DealSeeker')
  * @public
  */
 module.exports = () => {
-	//console.log(`OPPORTUNITY`)
-  // FETCH ALL HOMEWORK OF FIXTURES NOT STARTED
-  // CREATE JOURNAL TRADING PER LEAGUE, SEASON, DATE_FIXURE
+  let iOpportunities = 0
   const spinner = mod_ora().start(`Seeking opportunies from homeworks...`)
   
   mod_async.waterfall([
@@ -35,17 +33,19 @@ module.exports = () => {
     },
     (_, done) => {
       const oDealSeeker = new DealSeeker(_)
-      oDealSeeker.batch((err, data) => {
-        if (err) return done(err)
-        console.log(oDealSeeker.opportunities)
-        done(null)
-      })
-    }
+      oDealSeeker.batch(done)
+    },
+    (_, done) => {
+      iOpportunities = _.length
+      done(null, _)
+    },
+    Utils.addOpportunity
   ], (err, data) => {
     if (err) {
       spinner.fail(err.message)
       mod_process.exit(0)
     }
-    spinner.succeed('Done!')
+    spinner.succeed(`${iOpportunities} opportunities added !`)
+    mod_process.exit(1)
   })
 }

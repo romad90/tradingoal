@@ -8,6 +8,11 @@
       "url_source": "https://www.api-football.com/documentation-v3#operation/get-bookmakers"
     },
     {
+      "id": 2,
+      "name": "Marathonbet",
+      "url_source": "https://www.api-football.com/documentation-v3#operation/get-bookmakers"
+    },
+    {
       "id": 4,
       "name": "Pinnacle",
       "url_source": "https://www.api-football.com/documentation-v3#operation/get-bookmakers"

@@ -491,21 +491,18 @@ class Utils {
       const [odds, referal_bookie_id] = raw_odds
       const [home_odds, away_odds] = odds
       if (odds) {
-        homework.bookmaker_id = referal_bookie_id
-        homework.home_odds = home_odds
-        homework.away_odds = away_odds
+        const _home_odds = parseFloat(home_odds)
+        const _away_odds = parseFloat(away_odds)
         
-        if ( home_odds === 0 && away_odds === 0) {
-          homework.favorite = (home_team.total_market_value > away_team.total_market_value) ? home_team.team_id : away_team.team_id
-          homework.favorite_market_cap = (home_team.total_market_value > away_team.total_market_value) ? home_team.total_market_value : away_team.total_market_value
-          homework.underdog = (home_team.total_market_value < away_team.total_market_value) ? home_team.team_id : away_team.team_id
-          homework.underdog_market_cap = (home_team.total_market_value < away_team.total_market_value) ? home_team.total_market_value : away_team.total_market_value
-          
-        } else {
-          homework.favorite = (home_odds < away_odds) ? home_team.team_id : away_team.team_id
-          homework.favorite_market_cap = (home_odds < away_odds) ? home_team.total_market_value : away_team.total_market_value
-          homework.underdog = (home_odds > away_odds) ? home_team.team_id : away_team.team_id
-          homework.underdog_market_cap = (away_odds > away_odds) ? away_team.total_market_value : home_team.total_market_value
+        homework.bookmaker_id = referal_bookie_id
+        homework.home_odds = _home_odds
+        homework.away_odds = _away_odds
+        
+        if (home_odds != 0 && away_odds != 0) {   
+          homework.favorite = (_home_odds < _away_odds) ? home_team.team_id : away_team.team_id
+          homework.favorite_market_cap = (_home_odds < _away_odds) ? home_team.total_market_value : away_team.total_market_value
+          homework.underdog = (_home_odds < _away_odds) ? away_team.team_id : home_team.team_id
+          homework.underdog_market_cap = (_home_odds < _away_odds) ? away_team.total_market_value : home_team.total_market_value
         }
       }
       if (home_team.bnews && home_team.bnews.length > 0) {
@@ -519,6 +516,9 @@ class Utils {
   }
   
   addHomework(homeworks, cb) {
+    mod_assert.ok(Array.isArray(homeworks), "arguments 'teams' must be an object")
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    
     knex("HOMEWORK")
       .insert(homeworks)
       .onConflict("fixture_id")
@@ -531,14 +531,15 @@ class Utils {
     })
   }
   
-  getAllStrategy(cb) {
-    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
- 
-    knex('STRATEGY')
-    .select('*')
-	  .then((strategy) => {
-	    return cb(null, strategy)
-	  })
+  addOpportunity(opportunities, cb) {
+    mod_assert.ok(Array.isArray(opportunities), "arguments 'teams' must be an object")
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    
+    knex("OPPORTUNITY")
+      .insert(opportunities)
+    .then(_ => {
+      return cb(null) 
+    })
     .catch((error) => {
       mod_assert.fail(error,'Promise error')
     })
@@ -546,17 +547,21 @@ class Utils {
   
   getHomeworksNotStartedYet(cb) {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
-    knex('HOMEWORK')
-    .join('FIXTURE', 'HOMEWORK.fixture_id', 'FIXTURE.fixture_id')
-    .where('FIXTURE.status', '=', 'NS' )
-    .andWhere('HOMEWORK.home_odds', '>', 0)
-    .andWhere('HOMEWORK.away_odds', '>', 0)
-	  .then((homeworks) => {
-	    return cb(null, homeworks)
-	  })
-    .catch((error) => {
-      mod_assert.fail(error,'Promise error')
-    })
+    knex
+      .select('*')
+      .from('HOMEWORK')
+      .join('FIXTURE', 'HOMEWORK.fixture_id', 'FIXTURE.fixture_id')
+      .join('TEAM as FAV', 'HOMEWORK.favorite', 'FAV.team_id')
+      .join('TEAM as UDG', 'HOMEWORK.underdog', 'UDG.team_id')
+      .where('FIXTURE.status', '=', 'NS' )
+      .andWhere('HOMEWORK.home_odds', '>', 0)
+      .andWhere('HOMEWORK.away_odds', '>', 0)
+	    .then((homeworks) => {
+	      return cb(null, homeworks)
+	    })
+      .catch((error) => {
+        mod_assert.fail(error,'Promise error')
+      })
   }
 }
 

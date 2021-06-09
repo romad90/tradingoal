@@ -12,9 +12,9 @@ const mod_fs = require('fs')
  * Modules variables
  * @private
  */
-const knex = require('./src/knex.js')
-const WScrapper = require('./src/components/WScrapper')
-const footballAPi = require('./src/services/footballAPi.js')
+const knex = require('../src/knex.js')
+const WScrapper = require('../src/components/WScrapper')
+const footballAPi = require('../src/services/footballAPi.js')
 
 /**
  * Main
@@ -247,10 +247,12 @@ mod_async.series([
 		.catch(() => {})
   },
     */
+    /*
 	(cb) => {
 		footballAPi.getFixtureByDate({
+      season: 2021,
 			league: 128,
-			date: '2021-06-06'
+			date: '2021-06-13'
 		}, (err, fixtures) => {
 			if (err) return cb(err)
         
@@ -262,7 +264,8 @@ mod_async.series([
 				cb(null)
 			})
 		})
-	}
+	},
+    */
     /*
    (cb) => {
 
@@ -293,37 +296,36 @@ mod_async.series([
       	return cb(null)
     	})
   		.catch(() => {})
-    },*
+    },*/
 
-    /*
     (cb) => {
       const options = {
         method: 'GET',
-        url: 'https://v3.football.api-sports.io/odds/bookmakers',
+        url: 'https://v3.football.api-sports.io/fixtures',
         params: {
           //id: 688920,
           //bookmaker: 3,
-          //league: 71, 
-          //season: 2021,
-          //date: '2021-06-06',
+          league: 71, 
+          season: 2021,
+          date: '2021-06-13'
         },
         headers: {
           'x-rapidapi-host': 'v3.football.api-sports.io',
           'x-rapidapi-key': 'a9f6d46c4598107951d83d8aeb3f7d36'
         }
       }
-	  
+      
       mod_axios
   		.request(options)
     	.then(response => {
-        console.log(response)
+        //console.log(response)
       	response.data.response.forEach((_) => {
       	  console.log(_)
       	})
       	return cb(null)
     	})
   		.catch(() => {})
-    }*/
+    },
     /*
     (cb) => {
 
