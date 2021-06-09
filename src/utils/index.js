@@ -570,6 +570,7 @@ class Utils {
     knex
       .select(
         'LEA.league_name as lea_league_name',
+        'REL.reduction',
         'LEA.country as lea_country',
         'LEA.url_flag_country as lea_url_flag_country',
         'LEA.continent as lea_continent',
@@ -593,6 +594,7 @@ class Utils {
       .from('HOMEWORK as HK')
       .join('FIXTURE as FIX', 'HK.fixture_id', 'FIX.fixture_id')
       .join('LEAGUE as LEA', 'LEA.league_id', 'FIX.league_id')
+      .join('RELIABILITY as REL', 'LEA.league_id', 'REL.league_id')
       .join('TEAM as FAV', 'HK.favorite', 'FAV.team_id')
       .join('TEAM as UDG', 'HK.underdog', 'UDG.team_id')      
       .where('FIX.status', '=', 'NS' )
@@ -607,11 +609,11 @@ class Utils {
   }
   
   getOpportunity(opts, cb) {
-    console.log(opts)
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
     mod_assert.ok(typeof opts.hk_fixture_id === 'number' && opts.hk_fixture_id !== null, "arguments 'opts.hk_fixture_id' must be a number") 
     
-	  knex('OPPORTUNITY')
+	  knex('OPPORTUNITY as OPP')
+    .join('STRATEGY as STR', 'STR.strategy_id', 'OPP.strategy_id')
     .where('fixture_id', opts.hk_fixture_id)
 	  .then((_) => {
 	    return cb(null, _)

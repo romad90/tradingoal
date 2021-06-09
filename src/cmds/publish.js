@@ -27,15 +27,15 @@ module.exports = () => {
       // Get Opportunities per Fixtures
       mod_async.map(_, (opts, cb) => {
         Utils.getOpportunity(opts, (err, opportunities) => {
-          if (err) return cb(err)
-          
+          if (err) return cb(err)     
           opts.opportunities = opportunities
+          console.log(opts)
           cb(null, opts) 
         })
       }, done)
     }
   ], (err, data) => {
     if (err) throw err
-    console.log(data)
+
   })
 }
