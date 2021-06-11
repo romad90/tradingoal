@@ -400,7 +400,8 @@ class Utils {
     mod_assert.ok(typeof opts.fixture.timezone === 'string' && opts !== null, "arguments 'opts.fixture.timezone' must be a string")
     mod_assert.ok(typeof opts.teams.home.id === 'number' && opts !== null, "arguments 'opts.teams.home.id' must be a number")
     mod_assert.ok(typeof opts.teams.away.id === 'number' && opts !== null, "arguments 'opts.teams.away.id' must be a number")
-        
+    mod_assert.ok(typeof opts.league.round === 'string' && opts !== null, "arguments 'opts.league.round' must be a string")
+    
     return {
       league_id: opts.league.id,
       fixture_id: opts.fixture.id,
@@ -408,7 +409,8 @@ class Utils {
       timezone: opts.fixture.timezone,
       home_team: opts.teams.home.id,
       away_team: opts.teams.away.id,
-      status: opts.fixture.status.short
+      status: opts.fixture.status.short,
+      round: opts.league.round
     }
   }
   
@@ -576,6 +578,10 @@ class Utils {
         'LEA.continent as lea_continent',
         'LEA.url_logo as lea_url_logo',
         'HK.fixture_id as hk_fixture_id',
+        'FIX.date_fixture as fx_date_fixture',
+        'FIX.round as fx_round',
+        'HOM.short_name as hom_short_name',
+        'AWA.short_name as away_short_name',
         'HK.bookmaker_id as hk_bookmaker_id',
         'HK.home_odds as hk_home_odds',
         'HK.home_bnews as hk_home_bnews',
@@ -596,7 +602,9 @@ class Utils {
       .join('LEAGUE as LEA', 'LEA.league_id', 'FIX.league_id')
       .join('RELIABILITY as REL', 'LEA.league_id', 'REL.league_id')
       .join('TEAM as FAV', 'HK.favorite', 'FAV.team_id')
-      .join('TEAM as UDG', 'HK.underdog', 'UDG.team_id')      
+      .join('TEAM as UDG', 'HK.underdog', 'UDG.team_id')
+      .join('TEAM as HOM', 'FIX.home_team', 'HOM.team_id')      
+      .join('TEAM as AWA', 'FIX.away_team', 'AWA.team_id')
       .where('FIX.status', '=', 'NS' )
       .andWhere('HK.home_odds', '>', 0)
       .andWhere('HK.away_odds', '>', 0)
