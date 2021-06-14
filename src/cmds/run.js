@@ -29,6 +29,7 @@ module.exports = () => {
   let spinner
   mod_async.waterfall([
     Utils.getAllFixtureNotStartedYet,
+    /*
     (_, done) => {
       mod_async.filter(_, (fixture, callback) => {        
         footballAPi.getFixtureById(fixture, (err, data) => {
@@ -47,6 +48,7 @@ module.exports = () => {
         })
       } , done)
     },
+    */
     (fixturesNotStartedYet, done) => {
       spinner = mod_ora().start(`Doing homeworks, on fixtures available: [${fixturesNotStartedYet.length}] found.`)
       if (fixturesNotStartedYet.length === 0) return done(new Error('no fixtures have been found, please go fetch them first.'))

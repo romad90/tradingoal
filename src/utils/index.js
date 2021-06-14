@@ -53,6 +53,14 @@ const getPctTeamMarketDiff = function getPctTeamMarketDiff (higher_market_value,
     return 100 * higher_market_value / lower_market_value
 }
 
+function comparer(otherArray){
+  return function(current){
+    return otherArray.filter(function(other){
+      return other.number == current.number
+    }).length == 0;
+  }
+}
+
 /**
  * Module Manage transactions over MySQL data.
  * @module Utils
@@ -172,8 +180,6 @@ class Utils {
 					  return cb(null, players)
 				})
         .catch((error) => {
-          console.log(players)
-          console.log(error)
           mod_assert.fail(error,'Promise error')
         })
 			})
@@ -273,7 +279,7 @@ class Utils {
   updateFixtureToFinished(opts, cb) {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
-    mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
     
     knex('fixture')
       .where('fixture_id', '=', opts.fixture_id)
@@ -283,6 +289,21 @@ class Utils {
 	  .then((_) => {
 	    return cb(null, _)
 	  })
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })
+  }
+  
+  getPlayersByTeamId(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+    mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
+    
+    knex('player')
+      .where('team_id', '=', opts.team_id)
+    .then((_) => {
+      return cb(null, _)
+    })
     .catch((error) => {
       mod_assert.fail(error,'Promise error')
     })
@@ -420,33 +441,23 @@ class Utils {
   reAdjustMarketCapTeam(opts, cb) {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
     mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
-    mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
     mod_assert.ok(typeof opts.total_market_value === 'number' && opts.total_market_value !== null, "arguments 'opts.total_market_value' must be a number") 
     mod_assert.ok(Array.isArray(opts.bnews), "arguments 'opts.bnews' must be an array") 
     
-    let bnews = opts.bnews
+    if (opts.bnews === 0) {
+      return cb(null, opts) 
+    }
+    
     let total_missing_players_market_value = 0
-        
-    if (bnews.length === 0) {
-      return cb(null, opts)
-    } 
-      
-    mod_async.map(bnews, (_, callback) => {
-      this.searchPlayerByName(_, (err, player) => {
-        if (err) return callback(err)
-        if (player.market_value_unit === 'th') player.market_value = player.market_value % 1000
-        total_missing_players_market_value += player.market_value
-        player.pctValue = getPctMarketCapValue(opts.total_market_value, player.market_value)
-          if (player.pctValue >= 10)
-            player.keyNews = `Beware: ${player.name} represents ${player.pctValue} of the total market value team.` 
-        callback(null, player)
-      })
-    }, (err, bnewsUpdated) => {
-      if (err) return cb(err)
-      opts.bnews = bnewsUpdated
-      opts.total_market_value = (opts.total_market_value - total_missing_players_market_value)
-      cb (null, opts)
+    opts.bnews.forEach((_) => {
+      if (_.market_value_unit === 'th') _.market_value = _.market_value /1000
+      total_missing_players_market_value += _.market_value
     })
+    
+    opts.total_market_value = (opts.total_market_value - total_missing_players_market_value)
+    opts.bnews = JSON.stringify(opts.bnews)
+    
+    return cb (null, opts)
   }
   
   preHomeworkPerTeam (opts, cb) {
@@ -462,11 +473,29 @@ class Utils {
         done(null, opts)
       },
       (_, done) => {
-        footballAPi.getInjuriesByTeam(_, (err, data) => {
+        this.getPlayersByTeamId(opts, (err, players) => {
           if (err) return done(err)
-          _.bnews = data
+          _.roster = players
+          done(null, _)
+        })
+      },
+      (_, done) => {
+        footballAPi.getLineUpsByTeam(opts, (err, line_ups) => {
+          if (err) return done(err)
+          
+          const listed = []
+          line_ups.forEach((_) => {
+            listed.push(_.player)
+          })
+          opts.listed = listed
           return done(null, _)
         })
+      },
+      (_, done) => {        
+        _.bnews = _.roster.filter(({ number: id1 }) => !_.listed.some(({ number: id2 }) => id2 == id1))
+        delete _.roster
+        delete _.listed
+        done(null, _)
       },
       this.reAdjustMarketCapTeam,
     ], (err, _) => {
@@ -486,7 +515,7 @@ class Utils {
       fixture_id: fixture_id
     }, (err, raw_odds) => {
       if (err) return cb(err)
-      const [home_team, away_team] =  teams        
+      const [home_team, away_team] =  teams
       const homework = {
         fixture_id: home_team.fixture_id,
         diff_market_cap: (home_team.total_market_value > away_team.total_market_value) ? getPctTeamMarketDiff(home_team.total_market_value, away_team.total_market_value) : getPctTeamMarketDiff(away_team.total_market_value, home_team.total_market_value),
@@ -533,6 +562,26 @@ class Utils {
     .catch((error) => {
       mod_assert.fail(error,'Promise error')
     })
+  }
+  
+  cleanPreviousOpportunity(opportunities, cb) {
+    mod_assert.ok(Array.isArray(opportunities), "arguments 'teams' must be an object")
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
+    
+    knex("OPPORTUNITY")
+      .delete()
+      .whereIn('fixture_id', 
+        opportunities.reduce(function (newArr, opportunity) {
+          newArr.push(opportunity.fixture_id)
+          return newArr
+        }, []
+      ))
+      .then(_ => {
+        return cb(null, opportunities) 
+      })
+      .catch((error) => {
+        mod_assert.fail(error,'Promise error')
+      })
   }
   
   addOpportunity(opportunities, cb) {
@@ -583,7 +632,9 @@ class Utils {
         'FIX.date_fixture as fx_date_fixture',
         'FIX.round as fx_round',
         'HOM.short_name as hom_short_name',
+        'HOM.total_market_value as hom_raw_total_market_value',
         'AWA.short_name as away_short_name',
+        'AWA.total_market_value as away_raw_total_market_value',
         'HK.bookmaker_id as hk_bookmaker_id',
         'HK.home_odds as hk_home_odds',
         'HK.home_bnews as hk_home_bnews',

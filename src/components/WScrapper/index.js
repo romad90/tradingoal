@@ -322,7 +322,7 @@ class WScrapper {
 
     const rDataAsExpected = (_) => {
       mod_assert.ok(typeof _ === 'object' && _ !== null, "argument 'opts' must be an object")
-      mod_assert.ok(_.numbers && _.numbers !== null, "argument 'opts.numbers' cannot be null")
+      mod_assert.ok(_.number && _.number !== null, "argument 'opts.number' cannot be null")
       mod_assert.ok(_.irrelevant && _.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
       mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null") 
       mod_assert.ok(_.birth_date && _.birth_date !== null, "argument 'opts.birth_date' cannot be null")
@@ -336,6 +336,7 @@ class WScrapper {
       return {
         team_id: opts.team_id,
         name: _.name.trim(),
+        number: _.number.trim(),
         position: postDeduction(_.irrelevant.trim()),
         birth_date: formatBirthDate(_.birth_date.trim()),
         market_value,
@@ -354,11 +355,12 @@ class WScrapper {
         const $ = mod_cheerio.load(html)
         const elemSelector = '#yw1 > table > tbody > tr'
         const rawKeys = [
-          'numbers',
+          'number',
           'irrelevant',
           'name',
           'birth_date',
           'market_value',
+          'sdfsdf'
         ]
 
         $(elemSelector).each((parentIdx, parentElem) => {
@@ -368,18 +370,27 @@ class WScrapper {
 
           $(parentElem).children().each((childIdx, childElem) => {
             const tdValue = $(childElem).text()
-                        
+            const tdValueDivNumber = $(childElem).find('td.zentriert.rueckennummer.bg_Torwart > div').text()
+            
             if(tdValue && !uniq[getHash(tdValue)]) {
               uniq[getHash(tdValue)] = true
               playerObj[rawKeys[keyIdx]] = tdValue.trim()
               keyIdx++
             }
+            
+            if(tdValueDivNumber && !uniq[getHash(tdValueDivNumber)]) {
+              uniq[getHash(tdValueDivNumber)] = true
+              playerObj[rawKeys[keyIdx]] = tdValueDivNumber.trim()
+              keyIdx++
+            }
           })
           data.push(rDataAsExpected(playerObj))
         })
+        
         return cb(null, data)
       })
       .catch((error) => {
+        console.log(error)
         mod_assert.isNotOk(error,'Promise error')
       })
   }

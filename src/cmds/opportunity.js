@@ -39,6 +39,7 @@ module.exports = () => {
       iOpportunities = _.length
       done(null, _)
     },
+    Utils.cleanPreviousOpportunity,
     Utils.addOpportunity
   ], (err, data) => {
     if (err) {

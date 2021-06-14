@@ -256,6 +256,34 @@ const getExtraPlayerInfos = (opts, cb) => {
   })
 }
 
+const getLineUpsByTeam = (opts, cb) => {
+  mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+  mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+  mod_assert.ok(typeof opts.fixture_id === 'number' && opts !== null, "arguments 'opts.fixture_id' must be a number")
+  mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
+  
+  mod_axios
+  .request({
+	  method: 'GET',
+	  url: `https://${config.get('rapidapi-host')}/fixtures/lineups`,
+  	params: {
+    	fixture: opts.fixture_id,
+      team: opts.team_id,
+  	},
+    headers
+  })
+  .then(_ => {
+    if (_.data.response.length === 0)
+      return cb(null, [])
+    
+    const data = _.data.response.pop()
+	  return cb(null, [].concat(data.startXI, data.substitutes))
+  })
+  .catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
+}
+
 /**
  * Module exports
  * @public
@@ -268,5 +296,6 @@ module.exports = {
   getInjuriesByTeam,
   getLiveFixtures,
   getFixtureById,
-  getExtraPlayerInfos
+  getExtraPlayerInfos,
+  getLineUpsByTeam
 }
