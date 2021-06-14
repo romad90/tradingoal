@@ -7,6 +7,7 @@
 const mod_async = require('async')
 const mod_axios = require('axios')
 const mod_fs = require('fs')
+const mod_moment = require('moment')
 
 /**
  * Modules variables
@@ -266,17 +267,40 @@ mod_async.series([
 		})
 	},
     */
-    /*
    (cb) => {
+     const months = {
+       'Jan': '01',
+       'Feb': '02',
+       'Mar': '03',
+       'Apr': '04',
+       'May': '05',
+       'Jun': '06',
+       'Jul': '07',
+       'Aug': '08',
+       'Sep': '09',
+       'Oct': '10',
+       'Nov': '11',
+       'Dec': '12',
+     }
+     const match = 'Mar 2, 2000 (21)'.split(',')
+     const first = match[0].split(' ')
+     const month = months[first[0]]
+     const day = first[1]
+     
+     console.log('--')
+     //console.log(mod_moment(dt).format('MMM DD, YYYY'))
+     console.log(month)
+     console.log(day)
+     console.log(match[1].match(/\b\d{4}\b/))
 
+     /*
       const options = {
         method: 'GET',
-        url: 'https://v3.football.api-sports.io/injuries',
+        url: 'https://v3.football.api-sports.io/fixtures',
         params: {
-          fixture: 688927,
-          team:134
+          id: 688930,
           //bookmaker: 3
-          //league: 188, 
+          //league: 71, 
           //season: 2021,
           //date: '2021-06-03',
         },
@@ -289,14 +313,15 @@ mod_async.series([
       mod_axios
   		.request(options)
     	.then(response => {
-        console.log(response)
+        //console.log(response)
       	response.data.response.forEach((_) => {
-      	  console.log(_)
+      	  //console.log(_)
       	})
       	return cb(null)
     	})
   		.catch(() => {})
-    },*/
+     */
+    },
     /*
     (cb) => {
       const options = {
@@ -327,7 +352,7 @@ mod_async.series([
   		.catch(() => {})
     },
     */
-    
+    /*
     (cb) => {
 
        const options = {
@@ -358,6 +383,7 @@ mod_async.series([
      	})
    		.catch(() => {})
      }
+    */
 ], (err, results) => {
     if (err) throw err
       console.log(results)

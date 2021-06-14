@@ -224,6 +224,38 @@ const getFixtureById = (opts, cb) => {
     mod_assert.fail(error,'Promise error')
   })
 }
+
+
+const getExtraPlayerInfos = (opts, cb) => {  
+  mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+  mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
+  mod_assert.ok(typeof opts.name === 'string' && opts !== null, "arguments 'opts.name' must be a string")
+  mod_assert.ok(typeof opts.team_id === 'number' && opts !== null, "arguments 'opts.team_id' must be a number")
+  
+  
+  mod_axios
+  .request({
+	  method: 'GET',
+	  url: `https://${config.get('rapidapi-host')}/players`,
+  	params: {
+    	search: opts.name,
+      team: opts.team_id,
+  	},
+    headers
+  })
+  .then(_ => {
+    if (_.data.response.length === 0) return cb(null)
+    if (_.data.response.length > 1) {
+      console.log(`[${_.data.response.length}] possibilities, need a manual intervation for player -> name ${opts.name} :: league_id ${opts.league_id} :: team ${opts.team_id}`)
+      return cb(null)
+    }
+	  return cb(null, _.data.response.pop())
+  })
+  .catch((error) => {
+    mod_assert.fail(error,'Promise error')
+  })
+}
+
 /**
  * Module exports
  * @public
@@ -235,5 +267,6 @@ module.exports = {
   getOddsByFixtureId,
   getInjuriesByTeam,
   getLiveFixtures,
-  getFixtureById
+  getFixtureById,
+  getExtraPlayerInfos
 }

@@ -5,6 +5,8 @@
  * @private
  */
 const mod_async = require('async')
+const mod_fs = require('fs')
+
 
 /**
  * Module variables
@@ -54,7 +56,6 @@ const reFormatDataSet = (opts, cb) => {
   })
 }
 
-
 /**
  * Module export
  * @public
@@ -70,16 +71,24 @@ module.exports = () => {
       mod_async.map(_, (opts, cb) => {
         Utils.getOpportunity(opts, (err, opportunities) => {
           if (err) return cb(err)     
-          opts.opportunities = opportunities
+            opts.opportunities = opportunities
+          console.log(opts)
           cb(null, opts) 
         })
       }, done)
     },
     (_, done) => {
-      mod_async.map(_, reFormatDataSet, done)
+      done(null, _)
+      //mod_async.map(_, reFormatDataSet, done)
     }
   ], (err, data) => {
     if (err) throw err
-    console.log(data)
+    console.log('\n')
+    const json = JSON.stringify(data)
+    mod_fs.writeFile(process.cwd()+'/raw/foo.json', json, (err) => {
+      if (!err) {
+        console.log('done')
+      }
+    })
   })
 }

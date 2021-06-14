@@ -172,6 +172,8 @@ class Utils {
 					  return cb(null, players)
 				})
         .catch((error) => {
+          console.log(players)
+          console.log(error)
           mod_assert.fail(error,'Promise error')
         })
 			})
@@ -451,8 +453,8 @@ class Utils {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")	
     mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
     mod_assert.ok(typeof opts.fixture_id === 'number' && opts.fixture_id !== null, "arguments 'opts.fixture_id' must be a number") 
-    mod_assert.ok(typeof opts.team_id === 'number' && opts.team_id !== null, "arguments 'opts.team_id' must be a number") 
-      
+    mod_assert.ok(typeof opts.team_id === 'number' && opts.team_id !== null, "arguments 'opts.team_id' must be a number")
+          
     mod_async.waterfall([
       mod_async.apply(this.getTeamById, opts),
       (_, done) => {
@@ -479,7 +481,7 @@ class Utils {
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
     
     const fixture_id = teams[0].fixture_id
-        
+            
     footballAPi.getOddsByFixtureId({
       fixture_id: fixture_id
     }, (err, raw_odds) => {
@@ -512,7 +514,7 @@ class Utils {
       }
       if (away_team.bnews && away_team.bnews.length > 0) {
         homework.away_bnews = away_team.bnews
-      }      
+      }
       return cb(null, homework)
     })
   }

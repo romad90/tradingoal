@@ -15,12 +15,57 @@ const mod_crypto = require('crypto')
  * @private
  */
 
+const footballAPi = require('../../services/footballAPi.js')
 const logger = require('../../logger')
 const knex = require('../../knex')
+
 const getHash = (s) => {
   mod_assert.ok(s, "argument 's' cannot be null")
   return mod_crypto.createHash('sha256').update(s).digest('hex')
 }
+
+const formatBirthDate = (birth_date) => {
+  if (birth_date && birth_date.search(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2}\,\s\d{4}\s\(\d{2}\)/g) === -1) {
+    return '1970-01-01'
+  }
+  const months = {
+    'Jan': '01',
+    'Feb': '02',
+    'Mar': '03',
+    'Apr': '04',
+    'May': '05',
+    'Jun': '06',
+    'Jul': '07',
+    'Aug': '08',
+    'Sep': '09',
+    'Oct': '10',
+    'Nov': '11',
+    'Dec': '12',
+  }
+  const match = birth_date.split(',')
+  const first = match[0].split(' ')
+  const month = months[first[0]]
+  const year = match[1].match(/\b\d{4}\b/g)
+  const day = first[1]
+  
+  return `${year}-${month}-${day}`
+}
+
+const postDeduction = (str) => {
+  if (str.search(/goalkeeper/i) > -1) {
+    return 'G'
+  } else if (str.search(/back/i) > -1) {
+    return 'D'
+  } else if (str.search(/midfield/i) > -1) {
+    return 'M'
+  }
+  else if (str.search(/winger|forward/i) > -1) {
+    return 'F'
+  } else {
+    return 'NC.'
+  }
+}
+
 const rValueAsExpected = (opts) => {
   mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' cannot be null")
   mod_assert.ok(typeof opts.value === 'string' && opts.value !== null, "argument 'opts.value' cannot be null")
@@ -228,8 +273,8 @@ class WScrapper {
           'unknow',
           'average_age',
           'foreigners',
+          'mean_market_value',
           'total_market_value',
-          'mean_market_value'
         ]
 
         $(elemSelector).each((parentIdx, parentElem) => {
@@ -281,7 +326,7 @@ class WScrapper {
       mod_assert.ok(_.irrelevant && _.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
       mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null") 
       mod_assert.ok(_.birth_date && _.birth_date !== null, "argument 'opts.birth_date' cannot be null")
-			
+			      
 			if (_.market_value === null) {
 				_.market_value = '€0.0m'
 			}
@@ -289,13 +334,14 @@ class WScrapper {
       const {value:market_value, unit:market_value_unit, currency:market_value_currency} = rValueAsExpected({value:_.market_value}) 
       
       return {
-				team_id: opts.team_id,
+        team_id: opts.team_id,
         name: _.name.trim(),
-        birth_date: _.birth_date.trim() === '- (-)' ? 'nc.' : _.birth_date.trim(),
+        position: postDeduction(_.irrelevant.trim()),
+        birth_date: formatBirthDate(_.birth_date.trim()),
         market_value,
         market_value_unit,
         market_value_currency,
-				last_update: knex.fn.now()
+        last_update: knex.fn.now()
       }
     }
 
@@ -322,7 +368,7 @@ class WScrapper {
 
           $(parentElem).children().each((childIdx, childElem) => {
             const tdValue = $(childElem).text()
-            
+                        
             if(tdValue && !uniq[getHash(tdValue)]) {
               uniq[getHash(tdValue)] = true
               playerObj[rawKeys[keyIdx]] = tdValue.trim()
