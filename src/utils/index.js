@@ -9,7 +9,7 @@
 const autoBind = require('auto-bind')
 const mod_async = require('async')
 const mod_assert = require('assert').strict
-const mysql = require('mysql2')  
+const mysql = require('mysql2')
 const config = require('config')
 
 /**
@@ -444,10 +444,10 @@ class Utils {
     mod_assert.ok(typeof opts.total_market_value === 'number' && opts.total_market_value !== null, "arguments 'opts.total_market_value' must be a number") 
     mod_assert.ok(Array.isArray(opts.bnews), "arguments 'opts.bnews' must be an array") 
     
-    if (opts.bnews === 0) {
+    if (opts.bnews.length === 0) {
       return cb(null, opts) 
     }
-    
+        
     let total_missing_players_market_value = 0
     opts.bnews.forEach((_) => {
       if (_.market_value_unit === 'th') _.market_value = _.market_value /1000
@@ -492,8 +492,13 @@ class Utils {
         })
       },
       (_, done) => {
+        if (_.listed.length === 0) {
+          delete _.roster
+          delete _.listed
+          _.bnews = []
+          return done(null, _)
+        }
         _.bnews = _.roster.filter(({ number: id1 }) => !_.listed.some(({ number: id2 }) => id2 == id1))
-        console.log(_.bnews)        
         delete _.roster
         delete _.listed
         done(null, _)
@@ -552,7 +557,7 @@ class Utils {
   addHomework(homeworks, cb) {
     mod_assert.ok(Array.isArray(homeworks), "arguments 'teams' must be an object")
     mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function!")
-    
+        
     knex("HOMEWORK")
       .insert(homeworks)
       .onConflict("fixture_id")
