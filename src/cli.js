@@ -18,6 +18,7 @@ module.exports = (args) => {
     .option('-o, --opportunity', 'determine the best strategies according homeworks for fixtures available')
     .option('-r, --run', 'do homeworks on fixtures fecthed to build journal trading')
     .option('-s, --status', 'show the datasets status')
+    .option('-n, --number', 'mediation to fix players number')
     .option('-v, --version', 'show package version')
 
   program.parse(args)
@@ -46,6 +47,10 @@ module.exports = (args) => {
 
   if (options.status) {
     require('../src/cmds/status.js')()
+  }
+  
+  if (options.number) {
+    require('../src/cmds/number.js')()
   }
 
   if (options.version) {

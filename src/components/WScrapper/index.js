@@ -6,6 +6,7 @@
  */
 
 const mod_assert = require('assert').strict
+const mod_async = require('async')
 const mod_axios = require('axios')
 const mod_cheerio = require('cheerio')
 const mod_crypto = require('crypto')
@@ -22,6 +23,12 @@ const knex = require('../../knex')
 const getHash = (s) => {
   mod_assert.ok(s, "argument 's' cannot be null")
   return mod_crypto.createHash('sha256').update(s).digest('hex')
+}
+
+const randomIntFromInterval = (min, max) => {
+    mod_assert.ok(typeof min === 'number', "argument 'min' must be a number")
+    mod_assert.ok(typeof max === 'number', "argument 'max' must be a number")
+  return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 const formatBirthDate = (birth_date) => {
@@ -59,7 +66,7 @@ const postDeduction = (str) => {
   } else if (str.search(/midfield/i) > -1) {
     return 'M'
   }
-  else if (str.search(/winger|forward/i) > -1) {
+  else if (str.search(/winger|forward|striker/i) > -1) {
     return 'F'
   } else {
     return 'NC.'
@@ -319,11 +326,14 @@ class WScrapper {
     mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
 		mod_assert.ok(typeof opts.url_players === 'string' && opts.url_players !== null, "argument 'opts.players' must be an string")
 		mod_assert.ok(typeof opts.team_id === 'number' && opts.team_id !== null, "argument 'opts.team_id' must be an string")
-
+    
+    const self = this
+    
     const rDataAsExpected = (_) => {
       mod_assert.ok(typeof _ === 'object' && _ !== null, "argument 'opts' must be an object")
       mod_assert.ok(_.number && _.number !== null, "argument 'opts.number' cannot be null")
       mod_assert.ok(_.irrelevant && _.irrelevant !== null, "argument 'opts.irrelevant' cannot be null")
+      mod_assert.ok(_.uri_player && _.uri_player !== null, "argument 'opts.uri_player' cannot be null")
       mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null") 
       mod_assert.ok(_.birth_date && _.birth_date !== null, "argument 'opts.birth_date' cannot be null")
 			      
@@ -333,9 +343,10 @@ class WScrapper {
       
       const {value:market_value, unit:market_value_unit, currency:market_value_currency} = rValueAsExpected({value:_.market_value}) 
       
-      return {
+      const player = {
         team_id: opts.team_id,
         name: _.name.trim(),
+        
         number: _.number.trim(),
         position: postDeduction(_.irrelevant.trim()),
         birth_date: formatBirthDate(_.birth_date.trim()),
@@ -344,6 +355,10 @@ class WScrapper {
         market_value_currency,
         last_update: knex.fn.now()
       }
+      if (!isNaN(_.number.trim())) player.number = parseInt(_.number.trim())
+      if (opts._isFullNameEnabled) player.full_name = _.uri_player.trim()
+        
+      return player
     }
 
     const data = []
@@ -357,10 +372,10 @@ class WScrapper {
         const rawKeys = [
           'number',
           'irrelevant',
+          'uri_player',
           'name',
           'birth_date',
-          'market_value',
-          'sdfsdf'
+          'market_value'
         ]
 
         $(elemSelector).each((parentIdx, parentElem) => {
@@ -371,7 +386,8 @@ class WScrapper {
           $(parentElem).children().each((childIdx, childElem) => {
             const tdValue = $(childElem).text()
             const tdValueDivNumber = $(childElem).find('td.zentriert.rueckennummer.bg_Torwart > div').text()
-            
+            const tdValueAHref = $(childElem).find('span.hide-for-small > a.spielprofil_tooltip').attr('href')
+                        
             if(tdValue && !uniq[getHash(tdValue)]) {
               uniq[getHash(tdValue)] = true
               playerObj[rawKeys[keyIdx]] = tdValue.trim()
@@ -383,6 +399,12 @@ class WScrapper {
               playerObj[rawKeys[keyIdx]] = tdValueDivNumber.trim()
               keyIdx++
             }
+            
+            if (tdValueAHref && !uniq[getHash(tdValueAHref)]) {
+              uniq[getHash(tdValueAHref)] = true
+              playerObj[rawKeys[keyIdx]] = tdValueAHref
+              keyIdx++
+            }
           })
           data.push(rDataAsExpected(playerObj))
         })
@@ -390,8 +412,30 @@ class WScrapper {
         return cb(null, data)
       })
       .catch((error) => {
+        mod_assert.fail(error,'Promise error')
+      })
+  }
+  
+  parseFullNamePlayer(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+  	mod_assert.ok(typeof opts === 'object' && opts !== null, "argument 'opts' must be an object")
+  	mod_assert.ok(typeof opts.uri === 'string' && opts.uri !== null, "argument 'opts.uri' must be an string")
+    
+    const data = []
+  
+    mod_axios(`https://www.transfermarkt.com${opts.uri}`)
+      .then(response => {
+        const html = response.data
+        const $ = mod_cheerio.load(html)
+        const elemSelector = '#main > div:nth-child(17) > div.large-8.columns > div:nth-child(2) > div.row.collapse > div.large-6.large-pull-6.small-12.columns.spielerdatenundfakten > div.spielerdaten > table > tbody > tr:nth-child(1) > td'
+      
+        const fullName = $(elemSelector).text().trim()
+
+        return cb(null, fullName)
+      })
+      .catch((error) => {
         console.log(error)
-        mod_assert.isNotOk(error,'Promise error')
+        mod_assert.fail(error,'Promise error')
       })
   }
 }

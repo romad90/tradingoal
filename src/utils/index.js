@@ -174,7 +174,7 @@ class Utils {
 			  if (err) return cb(err)
 			  knex('PLAYER')
 				  .insert(players)
-          .onConflict('team_id', 'short_name', 'birth_date')
+          .onConflict('team_id', 'name', 'birth_date')
           .merge()
 				  .then(() => {
 					  return cb(null, players)
@@ -491,8 +491,9 @@ class Utils {
           return done(null, _)
         })
       },
-      (_, done) => {        
+      (_, done) => {
         _.bnews = _.roster.filter(({ number: id1 }) => !_.listed.some(({ number: id2 }) => id2 == id1))
+        console.log(_.bnews)        
         delete _.roster
         delete _.listed
         done(null, _)
@@ -631,6 +632,7 @@ class Utils {
         'HK.fixture_id as hk_fixture_id',
         'FIX.date_fixture as fx_date_fixture',
         'FIX.round as fx_round',
+        'FIX.status as fx_status',
         'HOM.short_name as hom_short_name',
         'HOM.total_market_value as hom_raw_total_market_value',
         'AWA.short_name as away_short_name',
@@ -682,6 +684,34 @@ class Utils {
     .catch((error) => {
       mod_assert.fail(error,'Promise error')
     })  
+  }
+
+  getIPlayersWithoutNumber(cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+
+    knex('PLAYER')
+    .count('name as NumberOfPlayersWithoutNumber')
+    .where('number', '=' ,'-')
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    })  
+  }
+
+  getTeamsHavingManyPlayersWithoutNumber(opts, cb) {
+    mod_assert.ok(typeof cb === 'function', "argument 'cb' must be a function")
+    mod_assert.ok(typeof opts.limit === 'number' && opts.limit !== null, "arguments 'opts.limit' must be a number")
+
+    knex
+    .raw(`SELECT p.team_id, t.name FROM PLAYER p JOIN TEAM t ON p.team_id = t.team_id WHERE p.number = '-' GROUP BY p.team_id, t.name HAVING COUNT(p.number) > ${opts.limit};`)
+	  .then((_) => {
+	    return cb(null, _)
+	  })
+    .catch((error) => {
+      mod_assert.fail(error,'Promise error')
+    }) 
   }
  }
 

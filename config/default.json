@@ -60,6 +60,11 @@
         "Fortaleza": "Fortaleza EC",
         "RB Bragantino": "Bragantino"
       }
+    },
+    "player_number": {
+      "brazil": {
+        "144" : "https://www.flashscore.com/team/atletico-go/8M0mP8nt/squad/"
+      }
     }
   },
   "mysql": {
