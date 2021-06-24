@@ -32,6 +32,14 @@ const isUnderdogPlayingAway = (homework) => {
   return homework.home_odds < homework.away_odds
 }
 
+const isFavRealFav = (homework) =>  {
+    mod_assert.ok(typeof homework === 'object' && homework !== null, "argument 'homework' cannot be null")
+    mod_assert.ok(typeof homework.favorite_market_cap === 'number' && homework.favorite_market_cap !== null, "argument 'opts.favorite_market_cap' cannot be null")
+    mod_assert.ok(typeof homework.underdog_market_cap === 'number' && homework.underdog_market_cap !== null, "argument 'opts.underdog_market_cap' cannot be null")
+  
+  return homework.favorite_market_cap > homework.underdog_market_cap
+}
+
 class DealSeeker {
   constructor(opts) {
     mod_assert.ok(opts, "argument 'opts' cannot be null")
@@ -65,6 +73,13 @@ class DealSeeker {
     mod_assert.ok(typeof homework.favorite_market_cap === 'number', "argument 'opts.favorite_market_cap' must be a number")
     mod_assert.ok(typeof homework.underdog === 'number', "argument 'opts.underdog' must be a number")
     mod_assert.ok(typeof homework.underdog_market_cap === 'number', "argument 'opts.underdog_market_cap' must be a number")
+    
+    if (!isFavRealFav(homework)) {
+      return cb(null, {
+        fixture_id: homework.fixture_id,
+        strategy_id: 8
+      })
+    }
     
     if (homework.diff_market_cap >= 250) {
       if (isUnderdogPlayingAway(homework)) {

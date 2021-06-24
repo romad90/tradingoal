@@ -434,7 +434,6 @@ class WScrapper {
         return cb(null, fullName)
       })
       .catch((error) => {
-        console.log(error)
         mod_assert.fail(error,'Promise error')
       })
   }

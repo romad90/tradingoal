@@ -407,8 +407,8 @@ class Utils {
             number_players
           },
           expected: {
-            number_teams: number_teams_expected,
-            number_players:number_players_expected
+            number_teams: number_players_expected,
+            number_players : number_players_expected
           }
         }
       })  
@@ -491,7 +491,7 @@ class Utils {
           return done(null, _)
         })
       },
-      (_, done) => {
+      (_, done) => {        
         if (_.listed.length === 0) {
           delete _.roster
           delete _.listed

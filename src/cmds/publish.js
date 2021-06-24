@@ -61,10 +61,8 @@ const reFormatDataSet = (opts, cb) => {
  * @public
  */
 module.exports = () => {
-	console.log(`PUBLISH`)
   // FETCH ALL HOMEWORK OF FIXTURES NOT STARTED
   // CREATE JOURNAL TRADING PER LEAGUE, SEASON, DATE_FIXURE
-  
   mod_async.waterfall([
     Utils.getDatasetToPublish,
     (_, done) => {
@@ -83,7 +81,6 @@ module.exports = () => {
     }
   ], (err, data) => {
     if (err) throw err
-    console.log('\n')
     const json = JSON.stringify(data)
     mod_fs.writeFile(process.cwd()+'/raw/foo.json', json, (err) => {
       if (!err) {
