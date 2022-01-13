@@ -235,7 +235,7 @@ class WScrapper {
     const rDataAsExpected = (_) => {
       mod_assert.ok(typeof _ === 'object' && _ !== null, "argument 'opts' must be an object")
       mod_assert.ok(_.url_players && _.url_players !== null, "argument 'opts.url_players' cannot be null")
-      mod_assert.ok(_.url_logo && _.url_logo !== null, "argument 'opts.url_logo' cannot be null") 
+      //mod_assert.ok(_.url_logo && _.url_logo !== null, "argument 'opts.url_logo' cannot be null") 
       mod_assert.ok(_.name && _.name !== null, "argument 'opts.name' cannot be null")
       mod_assert.ok(_.short_name && _.short_name !== null, "argument 'opts.short_name' cannot be null")
       mod_assert.ok(_.squad && _.squad !== null, "argument 'opts.squad' cannot be null")
@@ -259,7 +259,7 @@ class WScrapper {
         average_market_value_player,
         average_market_value_player_unit,
         average_market_value_player_currency,
-        url_logo: _.url_logo,
+        url_logo: _.url_logo || '',
         url_players: _.url_players,
       }
     }
@@ -273,15 +273,13 @@ class WScrapper {
         const elemSelector = '#yw1 > table > tbody > tr'
         const rawKeys = [
           'url_players',
-          'url_logo',
           'name',
           'short_name',
           'squad',
-          'unknow',
           'average_age',
           'foreigners',
           'mean_market_value',
-          'total_market_value',
+          'total_market_value'
         ]
 
         $(elemSelector).each((parentIdx, parentElem) => {
@@ -298,18 +296,21 @@ class WScrapper {
               uniq[getHash(tdValue)] = true
               teamObj[rawKeys[keyIdx]] = tdValue
               keyIdx++
+              return
             }
             
              if(tdValueHref && !uniq[getHash(tdValueHref)]) {
               uniq[getHash(tdValueHref)] = true
               teamObj[rawKeys[keyIdx]] = tdValueHref
               keyIdx++
+               return
             }
             
             if(tdValueImgSrc && !uniq[getHash(tdValueImgSrc)]) {
               uniq[getHash(tdValueImgSrc)] = true
               teamObj[rawKeys[keyIdx]] = tdValueImgSrc
               keyIdx++
+              return
             }
           })
           data.push(rDataAsExpected(teamObj))
@@ -317,7 +318,8 @@ class WScrapper {
         return cb(null, data)
       })
       .catch((error) => {
-        mod_assert.isNotOk(error,'Promise error')
+        console.error(error)
+        //mod_assert.isNotOk(error,'Promise error')
       })
   }
 

@@ -59,6 +59,50 @@
         "Atlético-GO": "Atletico Goianiense",
         "Fortaleza": "Fortaleza EC",
         "RB Bragantino": "Bragantino"
+      },
+      "germany": {
+        "Bay. Leverkusen":"Bayer Leverkusen",
+        "Hertha BSC":"Hertha Berlin",
+        "Arm. Bielefeld":"Arminia Bielefeld",
+        "1.FSV Mainz 05":"FSV Mainz 05",
+        "Greuther Fürth":"SpVgg Greuther Furth",
+        "Bor. M'gladbach":"Borussia Monchengladbach",
+        "FC Bayern":"Bayern Munich",
+        "Bor. Dortmund":"Borussia Dortmund",
+        "E. Frankfurt":"Eintracht Frankfurt",
+        "TSG Hoffenheim":"1899 Hoffenheim",
+        "1. FC Köln":"FC Koln"
+      },
+      "england": {
+        "Man City":"Manchester City",
+        "Man Utd":"Manchester United",
+        "Spurs":"Tottenham"
+      },
+      "france": {
+        "FC Lorient":"Lorient",
+        "FC Nantes":"Nantes",
+        "Olympique Lyon":"Lyon",
+        "OGC Nice":"Nice",
+        "Saint-Étienne":"Saint Etienne",
+        "Paris SG":"Paris Saint Germain",
+        "SCO Angers":"Angers",
+        "R. Strasbourg":"Strasbourg",
+        "FC Metz":"Metz",
+        "Stade Reims":"Reims",
+        "G. Bordeaux":"Bordeaux",
+        "Stade Brest 29":"Stade Brestois 29",
+        "Stade Rennais":"Rennes",
+        "Troyes":"Estac Troyes",
+        "LOSC Lille":"Lille"
+      },
+      "spain": {
+        "Cádiz CF":"Cadiz",
+        "Athletic":"Athletic Club",
+        "Sevilla FC":"Sevilla",
+        "Elche CF":"Elche",
+        "CA Osasuna":"Osasuna",
+        "RCD Mallorca":"Mallorca",
+        "Celta de Vigo":"Celta Vigo"
       }
     },
     "player_number": {
@@ -73,7 +117,7 @@
     "port": 3306 ,
     "user": "root",
     "password": "W%Lr9<5DC3b*$]F}",
-    "database": "season_20_21",
+    "database": "season_21_22",
     "timeout": 10
   },
   "leagues": {
@@ -113,17 +157,10 @@
         "league_id" : 39,
         "filter": {
           "continent": "UEFA",
-          "country": "England"
+          "country": "England",
+          "players": "560"
         }
-      },
-      {
-        "name": "Championship",
-        "league_id" : 40,
-        "filter": {
-          "continent": "UEFA",
-          "country": "England"
-	        }
-	     }
+      }
      ],
      "france": [
        {
@@ -131,7 +168,8 @@
          "league_id" : 61,
          "filter": {
            "continent": "UEFA",
-           "country": "France"
+           "country": "France",
+           "league_name": "Ligue 1"
          }
        }
      ],
@@ -141,7 +179,8 @@
          "league_id" : 78,
          "filter": {
            "continent": "UEFA",
-           "country": "Germany"
+           "country": "Germany",
+           "players": "534"
          }
        }
      ],
@@ -181,7 +220,8 @@
 	       "league_id" : 140,
 	       "filter": {
 	         "continent": "UEFA",
-					 "country": "Spain"
+					 "country": "Spain",
+           "players": "516"
            }
          }
     ],

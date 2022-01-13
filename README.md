@@ -34,6 +34,7 @@ Being a software engineer with a slight interest on football and trading, I just
 
 ## Table of contents
 
+- [Prerequisites](#prerequisites)
 - [Import](#import)
 - [Fixture](#fixture)
 - [Publish](#publish)
@@ -46,7 +47,9 @@ Being a software engineer with a slight interest on football and trading, I just
 
 
 ---
+## Prerequisites
 
+Get a license via https://www.api-football.com.
 
 ## Import
 

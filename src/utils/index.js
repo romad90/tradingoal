@@ -129,6 +129,7 @@ class Utils {
 					return cb(null, leagues)
 				})
       .catch((error) => {
+        //console.error(error)
         mod_assert.fail(error,'Promise error')
       })	
 		})
@@ -364,7 +365,8 @@ class Utils {
 		  return cb(null, _.pop())
     })
     .catch((error) => {
-      mod_assert.fail(error,'Promise error')
+      console.error(error)
+      //mod_assert.fail(error,'Promise error')
     })
   }
   
@@ -465,7 +467,7 @@ class Utils {
     mod_assert.ok(typeof opts === 'object' && opts !== null, "arguments 'opts' must be an object")
     mod_assert.ok(typeof opts.fixture_id === 'number' && opts.fixture_id !== null, "arguments 'opts.fixture_id' must be a number") 
     mod_assert.ok(typeof opts.team_id === 'number' && opts.team_id !== null, "arguments 'opts.team_id' must be a number")
-          
+    
     mod_async.waterfall([
       mod_async.apply(this.getTeamById, opts),
       (_, done) => {
